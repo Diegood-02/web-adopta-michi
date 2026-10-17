@@ -1,0 +1,415 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>Tu Michi Adopción</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@500;600;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Estilos del plugin -->
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.css"
+    />
+
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick-theme.css"
+    />
+
+    <!-- Tus estilos van después -->
+    <link rel="stylesheet" href="styles.css" />
+
+    <!-- Orden: jQuery, Slick y tu archivo -->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js" defer></script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.min.js"
+      defer
+    ></script>
+    <script src="script.js" defer></script>
+  </head>
+
+  <body>
+    <!-- MENÚ DE NAVEGACIÓN -->
+    <header class="navbar">
+      <a href="#inicio" class="logo">
+        <span class="logo-icon">🐱</span>
+        Tu Michi <span>Adopción</span>
+      </a>
+
+      <nav class="nav-links" aria-label="Menú principal">
+        <a href="#inicio" class="activo">Inicio</a>
+        <a href="#catalogo">Catálogo</a>
+        <a href="#beneficios">Blog</a>
+        <a href="#beneficios">Veterinarios</a>
+      </nav>
+
+      <a href="#" class="btn btn-login">Iniciar sesión →</a>
+    </header>
+
+    <main>
+      <!-- SECCIÓN DE BIENVENIDA -->
+      <section class="hero" id="inicio">
+        <div class="hero-texto">
+          <span class="etiqueta">🐾 Un hogar para cada michi</span>
+
+          <h1>
+            Encuentra a tu nuevo
+            <em>mejor amigo ♥</em>
+          </h1>
+
+          <p>
+            Conectamos gatos rescatados con familias amorosas. Cada adopción es
+            un acto de amor que cambia dos vidas.
+          </p>
+
+          <div class="hero-botones">
+            <a href="#catalogo" class="btn btn-primary">
+              🐾 Ver gatos en adopción
+            </a>
+
+            <a href="#beneficios" class="btn btn-secondary"> Aprende más </a>
+          </div>
+        </div>
+
+        <div class="hero-imagen">
+          <div class="circulo circulo-lila"></div>
+          <div class="circulo circulo-amarillo"></div>
+          <div class="hero-carrusel" aria-label="Fotografías de gatitos">
+            <div>
+              <img
+                src="img/gato-4.jpg"
+                alt="Zafiro, gato de ojos azules esperando una familia"
+              />
+            </div>
+
+            <div>
+              <img
+                src="img/gato-3.jpg"
+                alt="Copito, gato blanco mirando hacia arriba"
+              />
+            </div>
+
+            <div>
+              <img
+                src="img/gato-7.jpg"
+                alt="Duraznito, gato naranja con blanco buscando un hogar"
+              />
+            </div>
+          </div>
+
+          <div class="adopciones-badge">
+            <span>♥</span>
+            <div>
+              <small>Adoptados hoy</small>
+              <strong>3 michis</strong>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- BENEFICIOS -->
+      <section class="beneficios" id="beneficios">
+        <div class="titulo-seccion">
+          <span class="subtitulo">♥ ADOPTAR ES AMAR ♥</span>
+          <h2>¿Por qué adoptar con nosotros?</h2>
+          <p>
+            Somos una plataforma transparente, segura y comprometida con el
+            bienestar felino.
+          </p>
+        </div>
+
+        <div class="beneficios-grid">
+          <article class="beneficio-card borde-lila">
+            <div class="icono icono-lila">🛡️</div>
+            <h3>Adopciones responsables</h3>
+            <p>
+              Cada gato cuenta con historial médico completo y un proceso de
+              seguimiento post-adopción.
+            </p>
+            <span class="decoracion">♥</span>
+          </article>
+
+          <article class="beneficio-card borde-rosa">
+            <div class="icono icono-rosa">💕</div>
+            <h3>Encuentra tu compatibilidad</h3>
+            <p>
+              Filtra por personalidad, edad y estado de salud para encontrar a
+              tu compañero ideal.
+            </p>
+            <span class="decoracion">🐾</span>
+          </article>
+
+          <article class="beneficio-card borde-amarillo">
+            <div class="icono icono-amarillo">🐱</div>
+            <h3>Red de rescatistas</h3>
+            <p>
+              Trabajamos con rescatistas independientes verificados que cuidan a
+              cada gato con amor.
+            </p>
+            <span class="decoracion">♥</span>
+          </article>
+        </div>
+      </section>
+
+      <!-- CARRUSEL DE GATITOS (bloque completo) -->
+      <section
+        class="catalogo"
+        id="catalogo"
+        aria-roledescription="carrusel"
+        aria-label="Michis que buscan un hogar"
+      >
+        <header class="catalogo-encabezado">
+          <span class="subtitulo">🐾 CONOCE A TU COMPAÑERO</span>
+          <h2>Michis que buscan un hogar</h2>
+        </header>
+
+        <div class="carrusel-contenedor">
+          <button
+            class="flecha anterior"
+            type="button"
+            aria-label="Gato anterior"
+          >
+            &#10094;
+          </button>
+
+          <div class="carrusel" id="carrusel" tabindex="0">
+            <article
+              class="slide"
+              style="--foto: url('img/gato-1.jpg')"
+              role="group"
+              aria-roledescription="diapositiva"
+              aria-label="1 de 7: Nube"
+            >
+              <div class="slide-contenido">
+                <div class="slide-texto">
+                  <span class="estado">♥ En adopción</span>
+                  <h3>Nube</h3>
+                  <p class="slide-lema">Curioso y explorador</p>
+                  <p class="slide-desc">Le encantan las cajas de cartón y los túneles. Siempre está atento a todo.</p>
+                  <ul class="etiquetas"><li>Curioso</li><li>Juguetón</li></ul>
+                  <a href="#" class="btn btn-primary">Conóceme ♥</a>
+                </div>
+                <img
+                  src="img/gato-1.jpg"
+                  alt="Nube, gato en adopción"
+                  width="600"
+                  height="800"
+                />
+              </div>
+            </article>
+
+            <article
+              class="slide"
+              style="--foto: url('img/gato-2.jpg')"
+              role="group"
+              aria-roledescription="diapositiva"
+              aria-label="2 de 7: Canela"
+            >
+              <div class="slide-contenido">
+                <div class="slide-texto">
+                  <span class="estado">♥ En adopción</span>
+                  <h3>Canela</h3>
+                  <p class="slide-lema">Elegante y atenta</p>
+                  <p class="slide-desc">Se sienta a observar con calma y se acerca cuando confía en ti.</p>
+                  <ul class="etiquetas"><li>Tranquila</li><li>Atenta</li></ul>
+                  <a href="#" class="btn btn-primary">Conóceme ♥</a>
+                </div>
+                <img
+                  src="img/gato-2.jpg"
+                  alt="Canela, gato en adopción"
+                  width="600"
+                  height="800"
+                  loading="lazy"
+                />
+              </div>
+            </article>
+
+            <article
+              class="slide"
+              style="--foto: url('img/gato-3.jpg')"
+              role="group"
+              aria-roledescription="diapositiva"
+              aria-label="3 de 7: Copito"
+            >
+              <div class="slide-contenido">
+                <div class="slide-texto">
+                  <span class="estado">♥ En adopción</span>
+                  <h3>Copito</h3>
+                  <p class="slide-lema">Dulce como una nube</p>
+                  <p class="slide-desc">Pelaje suave y mirada tierna. Ideal para un hogar con mucho cariño.</p>
+                  <ul class="etiquetas"><li>Dulce</li><li>Sociable</li></ul>
+                  <a href="#" class="btn btn-primary">Conóceme ♥</a>
+                </div>
+                <img
+                  src="img/gato-3.jpg"
+                  alt="Copito, gato en adopción"
+                  width="600"
+                  height="800"
+                  loading="lazy"
+                />
+              </div>
+            </article>
+
+            <article
+              class="slide"
+              style="--foto: url('img/gato-4.jpg')"
+              role="group"
+              aria-roledescription="diapositiva"
+              aria-label="4 de 7: Zafiro"
+            >
+              <div class="slide-contenido">
+                <div class="slide-texto">
+                  <span class="estado">♥ En adopción</span>
+                  <h3>Zafiro</h3>
+                  <p class="slide-lema">Ojos de cielo</p>
+                  <p class="slide-desc">Te mira directo a los ojos y pide mimos en cuanto llegas.</p>
+                  <ul class="etiquetas"><li>Cariñoso</li><li>Expresivo</li></ul>
+                  <a href="#" class="btn btn-primary">Conóceme ♥</a>
+                </div>
+                <img
+                  src="img/gato-4.jpg"
+                  alt="Zafiro, gato en adopción"
+                  width="600"
+                  height="800"
+                  loading="lazy"
+                />
+              </div>
+            </article>
+
+            <article
+              class="slide"
+              style="--foto: url('img/gato-5.jpg')"
+              role="group"
+              aria-roledescription="diapositiva"
+              aria-label="5 de 7: Pelusa"
+            >
+              <div class="slide-contenido">
+                <div class="slide-texto">
+                  <span class="estado">♥ En adopción</span>
+                  <h3>Pelusa</h3>
+                  <p class="slide-lema">Relajada y serena</p>
+                  <p class="slide-desc">Pasa las tardes acurrucada, lista para ser tu compañera de siestas.</p>
+                  <ul class="etiquetas"><li>Calmada</li><li>Compañera</li></ul>
+                  <a href="#" class="btn btn-primary">Conóceme ♥</a>
+                </div>
+                <img
+                  src="img/gato-5.jpg"
+                  alt="Pelusa, gato en adopción"
+                  width="600"
+                  height="800"
+                  loading="lazy"
+                />
+              </div>
+            </article>
+
+            <article
+              class="slide"
+              style="--foto: url('img/gato-6.jpg')"
+              role="group"
+              aria-roledescription="diapositiva"
+              aria-label="6 de 7: Mango"
+            >
+              <div class="slide-contenido">
+                <div class="slide-texto">
+                  <span class="estado">♥ En adopción</span>
+                  <h3>Mango</h3>
+                  <p class="slide-lema">Aventurero de ventana</p>
+                  <p class="slide-desc">Le gusta vigilar desde lo alto y explorar cada rincón de la casa.</p>
+                  <ul class="etiquetas"><li>Aventurero</li><li>Observador</li></ul>
+                  <a href="#" class="btn btn-primary">Conóceme ♥</a>
+                </div>
+                <img
+                  src="img/gato-6.jpg"
+                  alt="Mango, gato en adopción"
+                  width="600"
+                  height="800"
+                  loading="lazy"
+                />
+              </div>
+            </article>
+
+            <article
+              class="slide"
+              style="--foto: url('img/gato-7.jpg')"
+              role="group"
+              aria-roledescription="diapositiva"
+              aria-label="7 de 7: Duraznito"
+            >
+              <div class="slide-contenido">
+                <div class="slide-texto">
+                  <span class="estado">♥ En adopción</span>
+                  <h3>Duraznito</h3>
+                  <p class="slide-lema">Bromista y juguetón</p>
+                  <p class="slide-desc">Siempre tiene una gracia lista y mucha energía para jugar.</p>
+                  <ul class="etiquetas"><li>Juguetón</li><li>Gracioso</li></ul>
+                  <a href="#" class="btn btn-primary">Conóceme ♥</a>
+                </div>
+                <img
+                  src="img/gato-7.jpg"
+                  alt="Duraznito, gato en adopción"
+                  width="600"
+                  height="800"
+                  loading="lazy"
+                />
+              </div>
+            </article>
+          </div>
+
+          <button
+            class="flecha siguiente"
+            type="button"
+            aria-label="Gato siguiente"
+          >
+            &#10095;
+          </button>
+        </div>
+
+        <div class="carrusel-controles">
+          <span class="contador" id="contador" aria-hidden="true"></span>
+          <div class="indicadores" id="indicadores" aria-label="Posición del carrusel"></div>
+          <button class="pausa" id="pausa" type="button" aria-label="Pausar carrusel">⏸</button>
+        </div>
+
+        <div class="progreso" aria-hidden="true"><span></span></div>
+      </section>
+
+      <!-- LLAMADO A LA ADOPCIÓN -->
+      <section class="adopta-banner">
+        <div>
+          <h2>
+            ♥ Miles de michis esperan una
+            <em>segunda oportunidad</em>
+          </h2>
+          <p>Adopta, cambia una vida 🐾</p>
+        </div>
+
+        <a href="#catalogo" class="btn btn-primary">
+          Ver gatos en adopción →
+        </a>
+      </section>
+    </main>
+
+    <!-- PIE DE PÁGINA -->
+    <footer class="footer">
+      <div>
+        <strong>Tu Michi Adopción 🐱</strong>
+        <p>© 2026 · Todos los derechos reservados</p>
+      </div>
+
+      <div class="footer-links">
+        <a href="#inicio">Inicio</a>
+        <a href="#catalogo">Catálogo</a>
+        <a href="#beneficios">Blog</a>
+        <a href="#beneficios">Veterinarios</a>
+      </div>
+    </footer>
+  </body>
+</html>
