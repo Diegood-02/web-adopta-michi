@@ -1,0 +1,998 @@
+<!doctype html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Michi QR | Gato voxel 3D</title>
+    <style>
+        :root {
+            --cream: #F4F0E6;
+            --text: #2f2b25;
+            --panel: rgba(255, 255, 255, 0.8);
+            --panel-border: rgba(255, 255, 255, 0.7);
+            --accent: #2c7a4b;
+            --shadow: 0 10px 28px rgba(52, 40, 25, 0.14);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            overflow: hidden;
+            font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+            background: radial-gradient(ellipse at 50% 38%, #fcf9f1 0%, #efe8d6 70%, #e4dcc7 100%);
+            color: var(--text);
+        }
+
+        #app {
+            width: 100vw;
+            height: 100vh;
+            position: relative;
+        }
+
+        canvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+            touch-action: none;
+        }
+
+        .ui {
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            align-items: center;
+            padding: 18px;
+            gap: 10px;
+        }
+
+        .title-badge {
+            margin-top: 6px;
+            margin-bottom: auto;
+            padding: 7px 14px;
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.72);
+            border: 1px solid rgba(255, 255, 255, 0.85);
+            box-shadow: 0 6px 18px rgba(58, 42, 26, 0.1);
+            font-size: 0.82rem;
+            font-weight: 700;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+            color: color-mix(in srgb, var(--text) 90%, #ffffff 10%);
+            backdrop-filter: blur(5px);
+        }
+
+        .status {
+            min-height: 20px;
+            font-size: 0.88rem;
+            padding: 4px 10px;
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.86);
+            border: 1px solid rgba(255, 255, 255, 0.9);
+            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.07);
+            opacity: 0.9;
+            transition: opacity 0.25s ease;
+        }
+
+        .status.ok {
+            color: #215b3a;
+        }
+
+        .status.error {
+            color: #b42318;
+            background: rgba(255, 228, 228, 0.9);
+        }
+
+        .coat-row,
+        .input-row,
+        .toggle-wrap {
+            pointer-events: auto;
+            width: min(640px, 100%);
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .coat-row,
+        .toggle-wrap {
+            width: min(520px, 100%);
+        }
+
+        .coat-row {
+            padding: 6px;
+            border-radius: 14px;
+            background: rgba(255, 255, 255, 0.62);
+            border: 1px solid rgba(255, 255, 255, 0.82);
+            backdrop-filter: blur(4px);
+            box-shadow: 0 8px 20px rgba(52, 39, 24, 0.1);
+        }
+
+        .input-row {
+            background: var(--panel);
+            border-radius: 14px;
+            padding: 10px;
+            border: 1px solid var(--panel-border);
+            backdrop-filter: blur(5px);
+            box-shadow: var(--shadow);
+        }
+
+        input[type="url"] {
+            flex: 1;
+            border: 1px solid rgba(0, 0, 0, 0.15);
+            border-radius: 10px;
+            padding: 10px 12px;
+            font-size: 0.95rem;
+            min-width: 0;
+            background: white;
+            color: var(--text);
+        }
+
+        input[type="url"]:focus {
+            outline: none;
+            border-color: rgba(44, 122, 75, 0.45);
+            box-shadow: 0 0 0 3px rgba(44, 122, 75, 0.16);
+        }
+
+        button {
+            border: none;
+            border-radius: 10px;
+            padding: 10px 14px;
+            font-size: 0.92rem;
+            font-weight: 600;
+            background: #ffffff;
+            color: var(--text);
+            cursor: pointer;
+            transition: transform 0.16s ease, opacity 0.16s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+            white-space: nowrap;
+        }
+
+        button:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.12);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        .toggle-btn {
+            background: linear-gradient(135deg, color-mix(in srgb, var(--accent) 92%, #ffffff 8%), var(--accent));
+            color: #fff;
+            border-radius: 999px;
+            padding: 11px 20px;
+            box-shadow: 0 10px 24px color-mix(in srgb, var(--accent) 38%, transparent);
+            letter-spacing: 0.01em;
+            min-width: 220px;
+        }
+
+        .coat-btn[data-coat="ginger"] {
+            background: #fff0df;
+        }
+
+        .coat-btn[data-coat="gray"] {
+            background: #e9edf3;
+        }
+
+        .coat-btn[data-coat="tuxedo"] {
+            background: #e5e3e7;
+        }
+
+        .coat-btn {
+            min-width: 102px;
+        }
+
+        .coat-btn.active {
+            outline: 2px solid rgba(0, 0, 0, 0.26);
+            transform: translateY(-1px);
+        }
+
+        @media (max-width: 560px) {
+            .coat-row {
+                gap: 8px;
+            }
+
+            button {
+                font-size: 0.84rem;
+                padding: 9px 10px;
+            }
+        }
+
+
+        /* Ocultar barra y botón de actualizar QR */
+        .input-row {
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="app">
+        <div class="ui">
+            <div class="title-badge">Michi QR · Gato 3D</div>
+            <div id="status" class="status" aria-live="polite"></div>
+
+            <div class="toggle-wrap">
+                <button id="toggleViewBtn" class="toggle-btn">Ver al michi en 3D</button>
+            </div>
+
+            <div class="input-row">
+                <input id="urlInput" type="url" placeholder="https://tusitio.com" aria-label="Enlace del código QR" />
+                <button id="generateBtn">Actualizar QR</button>
+            </div>
+
+            <div class="coat-row">
+                <button class="coat-btn active" data-coat="ginger">🐈 Naranja</button>
+                <button class="coat-btn" data-coat="gray">🐱 Gris</button>
+                <button class="coat-btn" data-coat="tuxedo">🐈‍⬛ Negro</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Si algún archivo externo falla, explica por qué no se ve el gato.
+        window.addEventListener('error', (event) => {
+            const status = document.getElementById('status');
+            if (!status) return;
+            const missingLibraries = !window.THREE || !window.gsap || !window.qrcode;
+            status.textContent = missingLibraries
+                ? 'No se cargaron las librerías 3D/QR. Comprueba tu conexión a Internet y vuelve a abrir el archivo.'
+                : 'No se pudo dibujar la escena: ' + (event.message || 'error de JavaScript');
+            status.classList.add('error');
+            status.style.opacity = '1';
+        });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.159.0/build/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.min.js"></script>
+    <script>
+        const app = document.getElementById('app');
+        const urlInput = document.getElementById('urlInput');
+        const generateBtn = document.getElementById('generateBtn');
+        const toggleViewBtn = document.getElementById('toggleViewBtn');
+        const statusEl = document.getElementById('status');
+        const coatButtons = Array.from(document.querySelectorAll('.coat-btn'));
+
+        // ---------- Escena ----------
+        const scene = new THREE.Scene();
+
+        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setClearColor(0x000000, 0);
+        renderer.shadowMap.enabled = true;
+        renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+        app.prepend(renderer.domElement);
+
+        const camera = new THREE.OrthographicCamera(-20, 20, 20, -20, 0.1, 500);
+        camera.position.set(0, 80, 0);
+        camera.up.set(0, 0, -1);
+        camera.lookAt(0, 0, 0);
+
+        // El mundo gira como un tornamesa; la luz va dentro para que el sombreado no cambie al girar.
+        const world = new THREE.Group();
+        scene.add(world);
+
+        const hemi = new THREE.HemisphereLight(0xfff6e4, 0x8d7a5e, 1.25);
+        world.add(hemi);
+        const sun = new THREE.DirectionalLight(0xffffff, 2.1);
+        sun.castShadow = true;
+        sun.shadow.mapSize.set(2048, 2048);
+        sun.shadow.bias = -0.0004;
+        sun.shadow.normalBias = 0.04;
+        world.add(sun);
+        world.add(sun.target);
+
+        const catGroup = new THREE.Group();
+        world.add(catGroup);
+
+        // ---------- Estado ----------
+        const cellSize = 1;
+        const quietZone = 4;
+        const qrFlatHeight = 0.1;
+        const dummy = new THREE.Object3D();
+        const tmpColor = new THREE.Color();
+        const tmpColor2 = new THREE.Color();
+
+        let qrWorldSize = 21;
+        let viewSize = 28;
+        let isDiorama = false;
+        let currentCoat = 'ginger';
+        let statusTimer = null;
+
+        let qrMesh = null;
+        let plinth = null;
+        let detailMesh = null;
+        let catMesh = null;
+        let particles = null;
+        let particleVelocities = [];
+        let entries = [];
+        let details = [];
+        let catVoxels = [];
+        let catScale = 0.6;
+        let catBaseY = 0.3;
+
+        let qrDirty = false;
+        let colorsDirty = false;
+
+        const blockAnim = { p: 0 };   // 0 = QR plano, 1 = diorama (alturas)
+        const catAnim = { n: 0 };    // fracción de voxels del gato visibles
+        const dragState = { active: false, x: 0 };
+
+        // Diferentes colores de pelaje; el QR conserva un contraste alto para escanearse.
+        const palettes = {
+            ginger: {
+                dark: '#423e38', light: '#fff9ef', grass: '#a7ce9b',
+                fur: '#ecaa63', stripe: '#c77c45', belly: '#fff1df',
+                earInner: '#e9a4aa', eye: '#3c3332', iris: '#72a974', pupil: '#1f2625',
+                shine: '#ffffff', nose: '#cf8290', whisker: '#fdf7ef',
+                soil: '#97705a', particle: '#f7dfae', uiAccent: '#bc6c39'
+            },
+            gray: {
+                dark: '#35495a', light: '#f9f9f7', grass: '#a6c9b6',
+                fur: '#8495a8', stripe: '#5f748d', belly: '#eff2f6',
+                earInner: '#d5a6b7', eye: '#303743', iris: '#9cc67d', pupil: '#1f2628',
+                shine: '#ffffff', nose: '#bd8c9c', whisker: '#ffffff',
+                soil: '#817f88', particle: '#dce9fa', uiAccent: '#556f8b'
+            },
+            tuxedo: {
+                dark: '#282931', light: '#fffaf1', grass: '#a4c4a1',
+                fur: '#34343d', stripe: '#4e4a53', belly: '#fff9ee',
+                earInner: '#bd8199', eye: '#1d2028', iris: '#d1b861', pupil: '#121721',
+                shine: '#ffffff', nose: '#df9da8', whisker: '#fefefe',
+                soil: '#78717b', particle: '#ece1d7', uiAccent: '#6a5d79'
+            }
+        };
+
+        const live = {};
+        Object.keys(palettes.ginger).forEach((key) => {
+            if (key !== 'uiAccent') live[key] = new THREE.Color(palettes.ginger[key]);
+        });
+
+        // ---------- Utilidades ----------
+        function mulberry32(a) {
+            return function () {
+                a |= 0; a = (a + 0x6D2B79F5) | 0;
+                let t = Math.imul(a ^ (a >>> 15), 1 | a);
+                t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+                return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+            };
+        }
+
+        function hashString(str) {
+            let h = 2166136261;
+            for (let i = 0; i < str.length; i++) {
+                h ^= str.charCodeAt(i);
+                h = Math.imul(h, 16777619);
+            }
+            return h >>> 0;
+        }
+
+        function cellHash(row, col) {
+            const v = Math.sin(row * 12.9898 + col * 78.233) * 43758.5453;
+            return v - Math.floor(v);
+        }
+
+        function setStatus(message, isError = false) {
+            if (statusTimer) {
+                clearTimeout(statusTimer);
+                statusTimer = null;
+            }
+            statusEl.textContent = message || '';
+            statusEl.classList.toggle('error', Boolean(isError));
+            statusEl.classList.toggle('ok', Boolean(message) && !isError);
+            statusEl.style.opacity = message ? '0.92' : '0';
+            if (message && !isError) {
+                statusTimer = setTimeout(() => {
+                    statusEl.style.opacity = '0';
+                }, 2400);
+            }
+        }
+
+        function normalizeUrl(raw) {
+            const value = raw.trim();
+            if (!value) throw new Error('Ingresa una URL.');
+            try {
+                return new URL(value).toString();
+            } catch {
+                if (/^[\w.-]+\.[A-Za-z]{2,}(\/.*)?$/.test(value)) {
+                    return new URL(`https://${value}`).toString();
+                }
+            }
+            throw new Error('URL inválida. Usa formato https://dominio.com');
+        }
+
+        function makeQrMatrix(url) {
+            const qr = qrcode(0, 'M');
+            qr.addData(url);
+            qr.make();
+            const count = qr.getModuleCount();
+            if (count > 65) {
+                throw new Error('La URL es muy larga para este modo voxel.');
+            }
+            const matrix = [];
+            for (let row = 0; row < count; row++) {
+                const values = [];
+                for (let col = 0; col < count; col++) {
+                    values.push(qr.isDark(row, col));
+                }
+                matrix.push(values);
+            }
+            return matrix;
+        }
+
+        function disposeMesh(mesh) {
+            if (!mesh) return;
+            mesh.parent && mesh.parent.remove(mesh);
+            mesh.geometry.dispose();
+            mesh.material.dispose();
+            if (mesh.dispose) mesh.dispose();
+        }
+
+        // ---------- Michi voxel procedural ----------
+        // Cubitos 3D: cuerpo, cabeza, orejas, carita, bigotes y cola.
+        function generateCat(seed) {
+            const rnd = mulberry32(seed);
+            const voxels = new Map();
+            const priority = {
+                fur: 1, stripe: 2, belly: 3, earInner: 4, muzzle: 4,
+                eye: 5, iris: 6, pupil: 7, shine: 8, nose: 8, whisker: 9
+            };
+            const key = (x, y, z) => `${x},${y},${z}`;
+            const put = (x, y, z, kind) => {
+                x = Math.round(x); y = Math.round(y); z = Math.round(z);
+                const k = key(x, y, z);
+                const old = voxels.get(k);
+                if (old && priority[old.kind] > priority[kind]) return;
+                voxels.set(k, { x, y, z, kind, j: rnd() - 0.5 });
+            };
+
+            function ellipsoid(cx, cy, cz, rx, ry, rz, kind) {
+                for (let x = Math.floor(cx - rx); x <= Math.ceil(cx + rx); x++) {
+                    for (let y = Math.max(0, Math.floor(cy - ry)); y <= Math.ceil(cy + ry); y++) {
+                        for (let z = Math.floor(cz - rz); z <= Math.ceil(cz + rz); z++) {
+                            const d = ((x - cx) / rx) ** 2 + ((y - cy) / ry) ** 2 + ((z - cz) / rz) ** 2;
+                            if (d <= 1) put(x, y, z, kind);
+                        }
+                    }
+                }
+            }
+
+            // Cuerpo sentado, caderas y patitas delanteras.
+            ellipsoid(0, 8.2, 0, 5.1, 7.1, 4.5, 'fur');
+            ellipsoid(-3.9, 4.3, -0.7, 2.8, 4.0, 3.5, 'fur');
+            ellipsoid(3.9, 4.3, -0.7, 2.8, 4.0, 3.5, 'fur');
+            ellipsoid(0, 8.5, 4.0, 2.9, 5.0, 1.5, 'belly');
+            for (const side of [-1, 1]) {
+                ellipsoid(side * 2.55, 3.9, 3.2, 1.65, 3.5, 1.65, 'fur');
+                ellipsoid(side * 2.55, 1.25, 4.1, 2.1, 1.35, 2.3, 'belly');
+                // Deditos de los pies, con tres marcas suaves.
+                for (let toe = -1; toe <= 1; toe++) {
+                    put(side * 2.55 + toe, 1, 6, 'stripe');
+                }
+            }
+
+            // Cuello, cabeza redonda y cachetes.
+            ellipsoid(0, 13.2, 0.7, 3.6, 3.0, 3.5, 'fur');
+            ellipsoid(0, 18.3, 1.5, 5.5, 4.8, 4.4, 'fur');
+            ellipsoid(-3.8, 16.2, 2.8, 2.05, 1.9, 2.5, 'fur');
+            ellipsoid(3.8, 16.2, 2.8, 2.05, 1.9, 2.5, 'fur');
+
+            // Orejas triangulares visibles incluso en el perfil.
+            for (const side of [-1, 1]) {
+                for (let y = 21; y <= 28; y++) {
+                    const t = (y - 21) / 7;
+                    const cx = side * (3.3 + t * 1.0);
+                    const rx = 2.1 * (1 - t) + 0.25;
+                    const rz = 1.8 * (1 - t) + 0.25;
+                    for (let x = Math.ceil(cx - rx); x <= Math.floor(cx + rx); x++) {
+                        for (let z = Math.ceil(1.25 - rz); z <= Math.floor(1.25 + rz); z++) {
+                            if (Math.abs(x - cx) / rx + Math.abs(z - 1.25) / (rz * 2) <= 1.3) {
+                                put(x, y, z, 'fur');
+                            }
+                        }
+                    }
+                    if (y >= 23 && y <= 26) {
+                        const innerWidth = Math.max(0, rx - 0.65);
+                        for (let x = Math.ceil(cx - innerWidth); x <= Math.floor(cx + innerWidth); x++) {
+                            put(x, y, Math.round(1.25 + rz + 0.3), 'earInner');
+                        }
+                    }
+                }
+            }
+
+            // Rayitas tabby en la frente y el lomo.
+            for (const side of [-1, 1]) {
+                for (let i = 0; i < 3; i++) {
+                    put(side * (1 + i), 21 - Math.floor(i * 0.5), 5.2 - i * 0.22, 'stripe');
+                    put(side * (3 + i), 12 - i, 3.2 - i * 0.3, 'stripe');
+                    put(side * (4 + i), 9 - i, 2.8 - i * 0.5, 'stripe');
+                }
+            }
+            for (let y = 20; y <= 22; y++) put(0, y, 5.1 - (y - 20) * 0.25, 'stripe');
+
+            // Ojos verdes/dorados, pupilas y reflejos blancos.
+            for (const side of [-1, 1]) {
+                const x = side * 2.25;
+                ellipsoid(x, 18.8, 5.65, 1.24, 1.38, 0.75, 'eye');
+                ellipsoid(x, 18.8, 6.19, 0.9, 1.06, 0.5, 'iris');
+                ellipsoid(x, 18.8, 6.55, 0.43, 0.80, 0.36, 'pupil');
+                put(Math.round(x), 19, 7, 'pupil');
+                put(Math.round(x) - side, 20, 7, 'shine');
+            }
+
+            // Hocico crema, naricita rosa y boca.
+            ellipsoid(-1.32, 16.0, 5.9, 1.85, 1.22, 1.35, 'muzzle');
+            ellipsoid(1.32, 16.0, 5.9, 1.85, 1.22, 1.35, 'muzzle');
+            for (let x = -1; x <= 1; x++) put(x, 17, 7.3, 'nose');
+            put(0, 16, 7.45, 'nose');
+            put(0, 15, 7.25, 'eye');
+            put(-1, 14, 7.0, 'eye');
+            put(1, 14, 7.0, 'eye');
+
+            // Tres bigotes finos a cada lado del hocico.
+            for (const side of [-1, 1]) {
+                for (let i = 0; i < 3; i++) {
+                    const y = 16 + (i - 1);
+                    for (let x = 4; x <= 7; x++) {
+                        const dy = i === 0 ? -(x - 4) * 0.26 : i === 2 ? (x - 4) * 0.25 : 0;
+                        put(side * x, Math.round(y + dy), 6.8 - (x - 4) * 0.16, 'whisker');
+                    }
+                }
+            }
+
+            // Cola curva a un costado (segmentos redondos de cubitos).
+            const tailPath = [
+                [4.8, 3.0, -2.0], [6.2, 2.7, -2.8], [7.7, 3.1, -3.1],
+                [9.0, 4.5, -3.1], [9.5, 6.4, -2.8], [9.4, 8.5, -2.5],
+                [8.8, 10.1, -2.3], [7.8, 11.2, -2.3]
+            ];
+            tailPath.forEach(([x, y, z], i) => {
+                ellipsoid(x, y, z, i === 7 ? 1.9 : 1.6, 1.65, 1.6,
+                    (i === 2 || i === 5) ? 'stripe' : 'fur');
+            });
+
+            // Omitimos los voxels totalmente interiores para dibujar menos cubos.
+            const result = [];
+            let maxY = 1;
+            voxels.forEach((v) => {
+                const hidden = voxels.has(key(v.x + 1, v.y, v.z)) && voxels.has(key(v.x - 1, v.y, v.z))
+                    && voxels.has(key(v.x, v.y + 1, v.z)) && voxels.has(key(v.x, v.y - 1, v.z))
+                    && voxels.has(key(v.x, v.y, v.z + 1)) && voxels.has(key(v.x, v.y, v.z - 1));
+                if (hidden) return;
+                result.push(v);
+                maxY = Math.max(maxY, v.y);
+            });
+            result.forEach((v) => { v.h = v.y / maxY; });
+            result.sort((a, b) => a.y - b.y);
+            return result;
+        }
+
+        function buildCat(seed) {
+            disposeMesh(catMesh);
+            catVoxels = generateCat(seed);
+            catScale = Math.min(0.64, Math.max(0.42, (qrWorldSize * 0.67) / 34));
+
+            const geo = new THREE.BoxGeometry(1, 1, 1);
+            const mat = new THREE.MeshLambertMaterial({ color: 0xffffff });
+            catMesh = new THREE.InstancedMesh(geo, mat, catVoxels.length);
+            catMesh.castShadow = true;
+            catMesh.receiveShadow = true;
+            catMesh.frustumCulled = false;
+
+            catVoxels.forEach((v, i) => {
+                dummy.position.set(v.x * catScale, catBaseY + (v.y + 0.5) * catScale, v.z * catScale);
+                dummy.scale.setScalar(catScale);
+                dummy.updateMatrix();
+                catMesh.setMatrixAt(i, dummy.matrix);
+            });
+            catMesh.instanceMatrix.needsUpdate = true;
+            catMesh.count = isDiorama ? catVoxels.length : 0;
+            catAnim.n = isDiorama ? 1 : 0;
+            catMesh.visible = isDiorama;
+            catGroup.add(catMesh);
+            recolorCat();
+        }
+
+        function recolorCat() {
+            if (!catMesh) return;
+            const kinds = {
+                fur: 'fur', stripe: 'stripe', belly: 'belly', muzzle: 'belly',
+                earInner: 'earInner', eye: 'eye', iris: 'iris', pupil: 'pupil',
+                shine: 'shine', nose: 'nose', whisker: 'whisker'
+            };
+            for (let i = 0; i < catVoxels.length; i++) {
+                const v = catVoxels[i];
+                tmpColor.copy(live[kinds[v.kind]] || live.fur);
+                if (v.kind === 'fur' || v.kind === 'stripe') {
+                    tmpColor.offsetHSL(0, 0, v.j * 0.085);
+                }
+                catMesh.setColorAt(i, tmpColor);
+            }
+            if (catMesh.instanceColor) catMesh.instanceColor.needsUpdate = true;
+        }
+
+        // ---------- QR / terreno ----------
+        function buildQr(matrix) {
+            disposeMesh(qrMesh);
+            disposeMesh(plinth);
+            disposeMesh(detailMesh);
+
+            const moduleCount = matrix.length;
+            const fullCount = moduleCount + quietZone * 2;
+            qrWorldSize = fullCount * cellSize;
+            viewSize = Math.max(22, qrWorldSize * 1.14);
+            const centerOffset = (fullCount - 1) / 2;
+            const catClear = Math.max(2.4, qrWorldSize * 0.06);
+
+            entries = [];
+            for (let row = 0; row < fullCount; row++) {
+                for (let col = 0; col < fullCount; col++) {
+                    const inQr = row >= quietZone && row < fullCount - quietZone && col >= quietZone && col < fullCount - quietZone;
+                    const dark = inQr ? matrix[row - quietZone][col - quietZone] : false;
+                    const x = (col - centerOffset) * cellSize;
+                    const z = (row - centerOffset) * cellSize;
+                    const rnd = cellHash(row, col);
+                    let dioH = dark ? 0.4 + rnd * 0.6 : 0.2 + rnd * 0.3;
+                    if (Math.hypot(x, z) <= catClear) dioH = 0.3;
+                    entries.push({ x, z, dark, dioH, h: qrFlatHeight, from: qrFlatHeight, to: qrFlatHeight, tone: rnd - 0.5 });
+                }
+            }
+            catBaseY = 0.3;
+
+            const geo = new THREE.BoxGeometry(1, 1, 1);
+            const mat = new THREE.MeshLambertMaterial({ color: 0xffffff });
+            qrMesh = new THREE.InstancedMesh(geo, mat, entries.length);
+            qrMesh.castShadow = isDiorama;
+            qrMesh.receiveShadow = true;
+            qrMesh.frustumCulled = false;
+            world.add(qrMesh);
+
+            // Base de tierra del diorama (queda bajo el plano del QR, invisible en vista plana).
+            plinth = new THREE.Mesh(
+                new THREE.BoxGeometry(qrWorldSize, 3, qrWorldSize),
+                new THREE.MeshLambertMaterial({ color: live.soil })
+            );
+            plinth.position.y = -1.5;
+            plinth.receiveShadow = true;
+            world.add(plinth);
+
+            // Flores y piedritas sobre celdas claras, lejos del gato.
+            const rng = mulberry32(hashString(urlInput.value || 'x') ^ 0x9e3779b9);
+            const candidates = entries.filter((e) => !e.dark && Math.hypot(e.x, e.z) > catClear + 3);
+            details = [];
+            for (let i = 0; i < Math.min(40, candidates.length); i++) {
+                const e = candidates.splice(Math.floor(rng() * candidates.length), 1)[0];
+                details.push({ entry: e, kind: rng() < 0.7 ? 'flower' : 'rock', size: 0.26 + rng() * 0.16, j: rng() });
+            }
+            detailMesh = new THREE.InstancedMesh(
+                new THREE.BoxGeometry(1, 1, 1),
+                new THREE.MeshLambertMaterial({ color: 0xffffff }),
+                Math.max(1, details.length)
+            );
+            detailMesh.castShadow = true;
+            detailMesh.frustumCulled = false;
+            world.add(detailMesh);
+
+            // Sol: sombras ajustadas al tamaño del QR.
+            const s = qrWorldSize;
+            sun.position.set(s * 0.55, s * 0.9, s * 0.4);
+            sun.target.position.set(0, 0, 0);
+            sun.shadow.camera.left = -s * 0.75;
+            sun.shadow.camera.right = s * 0.75;
+            sun.shadow.camera.top = s * 0.75;
+            sun.shadow.camera.bottom = -s * 0.75;
+            sun.shadow.camera.near = 0.5;
+            sun.shadow.camera.far = s * 3;
+            sun.shadow.camera.updateProjectionMatrix();
+
+            blockAnim.p = isDiorama ? 1 : 0;
+            entries.forEach((e) => { e.h = isDiorama ? e.dioH : qrFlatHeight; });
+
+            updateCameraFrustum();
+            buildCat(hashString(urlInput.value || 'seed'));
+            buildParticles();
+            qrDirty = true;
+            colorsDirty = true;
+        }
+
+        function updateQr() {
+            const rotate = blockAnim.p;
+            for (let i = 0; i < entries.length; i++) {
+                const e = entries[i];
+                dummy.position.set(e.x, e.h / 2, e.z);
+                dummy.scale.set(cellSize * 0.995, e.h, cellSize * 0.995);
+                dummy.updateMatrix();
+                qrMesh.setMatrixAt(i, dummy.matrix);
+            }
+            qrMesh.instanceMatrix.needsUpdate = true;
+
+            details.forEach((d, i) => {
+                const size = d.size * rotate;
+                dummy.position.set(d.entry.x, d.entry.h + size / 2, d.entry.z);
+                dummy.scale.set(size, d.kind === 'flower' ? size * 1.6 : size, size);
+                dummy.updateMatrix();
+                detailMesh.setMatrixAt(i, dummy.matrix);
+            });
+            if (details.length) detailMesh.instanceMatrix.needsUpdate = true;
+        }
+
+        function recolor() {
+            const mix = blockAnim.p;
+            for (let i = 0; i < entries.length; i++) {
+                const e = entries[i];
+                const flat = e.dark ? live.dark : live.light;
+                const dio = e.dark ? tmpColor2.copy(live.dark).lerp(live.grass, 0.4) : live.grass;
+                tmpColor.copy(flat).lerp(dio, mix);
+                tmpColor.offsetHSL(0, 0, e.tone * 0.07 * mix);
+                qrMesh.setColorAt(i, tmpColor);
+            }
+            if (qrMesh.instanceColor) qrMesh.instanceColor.needsUpdate = true;
+
+            const flowerColors = [live.earInner, new THREE.Color('#ffffff'), live.nose];
+            details.forEach((d, i) => {
+                if (d.kind === 'rock') tmpColor.set('#9a9588').offsetHSL(0, 0, d.j * 0.1);
+                else tmpColor.copy(flowerColors[Math.floor(d.j * 3) % 3]);
+                detailMesh.setColorAt(i, tmpColor);
+            });
+            if (detailMesh.instanceColor) detailMesh.instanceColor.needsUpdate = true;
+
+            if (plinth) plinth.material.color.copy(live.soil);
+            if (particles) particles.material.color.copy(live.particle);
+            recolorCat();
+        }
+
+        function updateCameraFrustum() {
+            const aspect = window.innerWidth / window.innerHeight;
+            const halfH = viewSize / 2;
+            const halfW = halfH * aspect;
+            camera.left = -halfW;
+            camera.right = halfW;
+            camera.top = halfH;
+            camera.bottom = -halfH;
+            camera.updateProjectionMatrix();
+        }
+
+        // ---------- Partículas decorativas cuando vemos al michi ----------
+        function buildParticles() {
+            if (particles) {
+                particles.geometry.dispose();
+                particles.material.dispose();
+                world.remove(particles);
+            }
+            const count = 110;
+            const pos = new Float32Array(count * 3);
+            particleVelocities = new Array(count);
+            for (let i = 0; i < count; i++) {
+                pos[i * 3] = (Math.random() - 0.5) * (qrWorldSize + 10);
+                pos[i * 3 + 1] = 5 + Math.random() * 12;
+                pos[i * 3 + 2] = (Math.random() - 0.5) * (qrWorldSize + 10);
+                particleVelocities[i] = 0.012 + Math.random() * 0.035;
+            }
+            const geo = new THREE.BufferGeometry();
+            geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+            const mat = new THREE.PointsMaterial({ color: live.particle, size: 0.13, transparent: true, opacity: 0.6 });
+            particles = new THREE.Points(geo, mat);
+            particles.visible = isDiorama;
+            world.add(particles);
+        }
+
+        // ---------- Animaciones ----------
+        function animateBlocks(toDiorama) {
+            entries.forEach((e) => {
+                e.from = e.h;
+                e.to = toDiorama ? e.dioH : qrFlatHeight;
+            });
+            const startP = blockAnim.p;
+            gsap.killTweensOf(blockAnim);
+            const proxy = { t: 0 };
+            gsap.to(proxy, {
+                t: 1,
+                duration: toDiorama ? 0.9 : 0.65,
+                ease: toDiorama ? 'power2.out' : 'power2.inOut',
+                onUpdate: () => {
+                    entries.forEach((e) => { e.h = e.from + (e.to - e.from) * proxy.t; });
+                    blockAnim.p = startP + ((toDiorama ? 1 : 0) - startP) * proxy.t;
+                    qrDirty = true;
+                    colorsDirty = true;
+                }
+            });
+        }
+
+        function showCat() {
+            if (!catMesh) return;
+            catMesh.visible = true;
+            gsap.killTweensOf(catAnim);
+            gsap.to(catAnim, {
+                n: 1,
+                duration: 1.6,
+                delay: 0.25,
+                ease: 'power1.out',
+                onUpdate: () => { catMesh.count = Math.max(1, Math.floor(catAnim.n * catVoxels.length)); }
+            });
+        }
+
+        function hideCat() {
+            if (!catMesh) return;
+            gsap.killTweensOf(catAnim);
+            gsap.to(catAnim, {
+                n: 0,
+                duration: 0.45,
+                ease: 'power2.inOut',
+                onUpdate: () => { catMesh.count = Math.floor(catAnim.n * catVoxels.length); },
+                onComplete: () => { catMesh.visible = false; }
+            });
+        }
+
+        function setCoatButtonState(coat) {
+            coatButtons.forEach((button) => {
+                button.classList.toggle('active', button.dataset.coat === coat);
+            });
+        }
+
+        function applyCoat(coat) {
+            currentCoat = coat;
+            setCoatButtonState(coat);
+            const palette = palettes[coat];
+            const proxy = { t: 0 };
+            Object.keys(live).forEach((name) => {
+                const target = new THREE.Color(palette[name]);
+                gsap.to(live[name], { r: target.r, g: target.g, b: target.b, duration: 0.75, ease: 'power1.inOut' });
+            });
+            gsap.to(proxy, { t: 1, duration: 0.8, onUpdate: () => { colorsDirty = true; } });
+
+            if (particles) {
+                particles.visible = isDiorama;
+            }
+            document.documentElement.style.setProperty('--accent', palette.uiAccent);
+        }
+
+        function setView(diorama) {
+            isDiorama = diorama;
+            toggleViewBtn.textContent = diorama ? 'Ver el código QR' : 'Ver al michi en 3D';
+            gsap.fromTo(toggleViewBtn, { scale: 0.97 }, { scale: 1, duration: 0.32, ease: 'back.out(2.4)' });
+
+            const distance = Math.max(30, qrWorldSize * 1.35);
+            const targetPos = diorama ? { x: distance, y: distance, z: distance } : { x: 0, y: 80, z: 0 };
+            const targetUp = diorama ? { x: 0, y: 1, z: 0 } : { x: 0, y: 0, z: -1 };
+
+            gsap.to(camera.position, { ...targetPos, duration: 1, ease: 'power2.inOut', onUpdate: () => camera.lookAt(0, 0, 0) });
+            gsap.to(camera.up, { ...targetUp, duration: 1, ease: 'power2.inOut', onUpdate: () => camera.lookAt(0, 0, 0) });
+            gsap.to(camera, {
+                zoom: diorama ? 0.86 : 1,
+                duration: 1,
+                ease: 'power2.inOut',
+                onUpdate: () => camera.updateProjectionMatrix()
+            });
+
+            // Al volver al QR, el diorama regresa a su ángulo original (por el camino corto).
+            const twoPi = Math.PI * 2;
+            if (!diorama) {
+                world.rotation.y = ((world.rotation.y % twoPi) + twoPi * 1.5) % twoPi - Math.PI;
+                gsap.to(world.rotation, { y: 0, duration: 0.8, ease: 'power2.inOut' });
+            }
+
+            qrMesh.castShadow = diorama;
+            animateBlocks(diorama);
+            if (particles) particles.visible = diorama;
+            if (diorama) showCat(); else hideCat();
+        }
+
+        function regenerateQrFromInput() {
+            try {
+                const normalized = normalizeUrl(urlInput.value);
+                const matrix = makeQrMatrix(normalized);
+                urlInput.value = normalized;
+                buildQr(matrix);
+                applyCoat(currentCoat);
+                setStatus('QR actualizado correctamente.');
+            } catch (error) {
+                setStatus(error.message || 'No se pudo generar el QR.', true);
+            }
+        }
+
+        function onResize() {
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            updateCameraFrustum();
+        }
+
+        // ---------- Giro del diorama con el puntero ----------
+        function setupDrag() {
+            const el = renderer.domElement;
+            el.addEventListener('pointerdown', (e) => {
+                if (!isDiorama) return;
+                dragState.active = true;
+                dragState.x = e.clientX;
+                gsap.killTweensOf(world.rotation);
+                el.setPointerCapture(e.pointerId);
+            });
+            el.addEventListener('pointermove', (e) => {
+                if (!dragState.active) return;
+                world.rotation.y += (e.clientX - dragState.x) * 0.008;
+                dragState.x = e.clientX;
+            });
+            const stop = () => { dragState.active = false; };
+            el.addEventListener('pointerup', stop);
+            el.addEventListener('pointercancel', stop);
+        }
+
+        function init() {
+            urlInput.value = 'https://maps.app.goo.gl/goSUewWHLMr5o1nE9';
+            statusEl.style.opacity = '0';
+            regenerateQrFromInput();
+            setView(false);
+
+            generateBtn.addEventListener('click', regenerateQrFromInput);
+            urlInput.addEventListener('keydown', (event) => {
+                if (event.key === 'Enter') {
+                    event.preventDefault();
+                    regenerateQrFromInput();
+                }
+            });
+
+            toggleViewBtn.addEventListener('click', () => setView(!isDiorama));
+
+            coatButtons.forEach((button) => {
+                button.addEventListener('click', () => {
+                    gsap.fromTo(button, { y: 0 }, { y: -2, duration: 0.14, yoyo: true, repeat: 1, ease: 'power1.inOut' });
+                    applyCoat(button.dataset.coat);
+                });
+            });
+
+            window.addEventListener('resize', onResize);
+            setupDrag();
+
+            // Atajos: #cat abre al michi; #gray y #tuxedo cambian el pelaje.
+            const hash = location.hash.slice(1).split(',');
+            if (hash.includes('gray') || hash.includes('tuxedo')) {
+                const coat = hash.includes('tuxedo') ? 'tuxedo' : 'gray';
+                Object.keys(live).forEach((name) => live[name].set(palettes[coat][name]));
+                applyCoat(coat);
+            }
+            if (hash.includes('cat')) {
+                setView(true);
+                gsap.globalTimeline.totalProgress(1);
+            }
+        }
+
+        function tick() {
+            requestAnimationFrame(tick);
+
+            if (qrDirty) { updateQr(); qrDirty = false; }
+            if (colorsDirty) { recolor(); colorsDirty = false; }
+
+            if (particles && particles.visible) {
+                const attr = particles.geometry.getAttribute('position');
+                const t = performance.now() * 0.001;
+                for (let i = 0; i < attr.count; i++) {
+                    let y = attr.array[i * 3 + 1];
+                    y -= particleVelocities[i];
+                    attr.array[i * 3] += Math.sin(t + i) * 0.006;
+                    if (y < 0.3) {
+                        y = 8 + Math.random() * 12;
+                        attr.array[i * 3] = (Math.random() - 0.5) * (qrWorldSize + 10);
+                        attr.array[i * 3 + 2] = (Math.random() - 0.5) * (qrWorldSize + 10);
+                    }
+                    attr.array[i * 3 + 1] = y;
+                }
+                attr.needsUpdate = true;
+            }
+
+            // Respiración muy sutil del gato, sin mover la base del diorama.
+            catGroup.scale.y = 1 + (isDiorama ? 0.006 * Math.sin(performance.now() * 0.0025) : 0);
+            camera.lookAt(0, 0, 0);
+            renderer.render(scene, camera);
+        }
+
+        init();
+        tick();
+    </script>
+</body>
+
+</html>

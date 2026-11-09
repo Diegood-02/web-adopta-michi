@@ -43,11 +43,11 @@
                                     <h1>Pequeñas vidas, <em>grandes encuentros.</em></h1>
                                     <p>Encuentra a tu nuevo mejor amigo. Conoce su historia, descubre su personalidad y
                                           comienza una adopción responsable.</p>
-                                    
+
                                     <div class="acciones"><a class="btn btn-rosa" href="adopciones.html">Conocer a los
                                                 michis ↗</a><a class="btn btn-outline" href="nosotros.html">Nuestro
                                                 proyecto</a></div>
-                                    
+
                               </div>
                               <div class="hero-visual"><img
                                           alt="Retrato de gatito blanco con iluminación cinematográfica"
@@ -275,6 +275,35 @@
       <script defer="" src="js/app.js"></script>
       <script defer="" src="js/animaciones.js"></script>
       <script defer src="js/asistente-michi.js"></script>
+
+      <button id="abrir-aviso-carrera" type="button" class="btn btn-lila aviso-flotante" aria-haspopup="dialog"
+            aria-controls="aviso-carrera">
+            <img src="img/run4cats.jpg" alt="">
+            <span>🔔 Avisos</span>
+      </button>
+
+      <dialog id="aviso-carrera" aria-labelledby="titulo-aviso-carrera">
+            <div class="aviso-cabecera">
+                  <h2 id="titulo-aviso-carrera">Carrera Run 4 Cats</h2>
+
+                  <form method="dialog">
+                        <button type="submit" class="btn btn-rosa" autofocus>Cerrar</button>
+                  </form>
+            </div>
+
+            <img src="img/run4cats.jpg"
+                  alt="Cartel de Run 4 Cats. Carrera de 5 km el 29 de noviembre en Polanco, Ciudad de México.">
+      </dialog>
+
+      <script>
+            document.addEventListener("DOMContentLoaded", () => {
+                  const aviso = document.getElementById("aviso-carrera");
+                  const boton = document.getElementById("abrir-aviso-carrera");
+
+                  boton.addEventListener("click", () => aviso.showModal());
+                  aviso.showModal();
+            });
+      </script>
 </body>
 
 </html>
