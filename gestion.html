@@ -1,0 +1,200 @@
+<!doctype html>
+
+<html lang="es">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1" name="viewport" />
+    <meta content="Prototipo Tu Michi Adopción" name="description" />
+    <meta content="#FFE5B4" name="theme-color" />
+    <title>Área de gestión | Tu Michi Adopción</title>
+    <link href="img/logo-michi.png" rel="icon" type="image/png" />
+    <link href="css/estilos.css" rel="stylesheet" />
+    <link href="css/revision.css" rel="stylesheet" />
+</head>
+
+<body data-pagina="gestion">
+    <header class="cabecera">
+        <div class="barra contenedor">
+            <a aria-label="Tu Michi Adopción, ir al inicio" class="marca" href="index.html"><img
+                    alt="Logotipo de Tu Michi Adopción" src="img/logo-michi.png" /><span>Tu Michi
+                    <b>Adopción</b></span></a><button aria-controls="menu-principal" aria-expanded="false"
+                class="boton-menu" id="menu-toggle" type="button">
+                ☰ <span>Menú</span>
+            </button>
+            <nav aria-label="Navegación principal" id="menu-principal">
+                <a href="index.html">Inicio</a>
+                <a href="nosotros.html">Quiénes somos</a>
+                <a href="adopciones.html">Adopciones</a>
+                <a href="solicitudes.html">Solicitudes</a>
+                <a href="ayuda.html">Ayuda</a>
+                <a href="blog.html">Blog</a>
+                <a href="veterinarias.html">Veterinarias</a>
+                <a aria-current="page" class="activo" href="gestion.html">Gestión (demo)</a>
+            </nav>
+        </div>
+    </header>
+    <main>
+        <section class="pagina-intro compacta crema-suave">
+            <div class="contenedor">
+                <span class="pre-titulo">⚙ PROTOTIPO INTERACTIVO</span>
+                <h1>Área de gestión</h1>
+                <p>
+                    Administra perfiles, solicitudes, veterinarias y mensajes de
+                    demostración.
+                </p>
+            </div>
+        </section>
+        <section class="bloque">
+            <div class="contenedor">
+                <div class="nota-demo">
+                    🔓 <strong>Acceso libre por ahora:</strong> esta pantalla es solo
+                    para practicar. Cuando implementes usuarios y base de datos deberá
+                    protegerse con autenticación y permisos de administrador.
+                </div>
+                <div class="grid-3 resumen" id="resumen-gestion"></div>
+                <div aria-label="Opciones de gestión" class="tabs" role="tablist">
+                    <button aria-selected="true" class="activo" data-tab="gatos" role="tab" type="button">
+                        🐱 Felinos</button><button aria-selected="false" data-tab="solicitudes" role="tab"
+                        type="button">
+                        📋 Solicitudes</button><button aria-selected="false" data-tab="vets" role="tab" type="button">
+                        🩺 Veterinarias</button><button aria-selected="false" data-tab="mensajes" role="tab"
+                        type="button">
+                        ✉ Mensajes
+                    </button>
+                </div>
+                <section class="panel-tab" id="tab-gatos" role="tabpanel">
+                    <div class="gestion-layout">
+                        <div class="tarjeta-blanca">
+                            <h2 id="titulo-form-gato">Agregar gatito</h2>
+                            <form class="formulario" id="form-gato">
+                                <input name="id" type="hidden" /><label>Nombre *<input maxlength="60" name="nombre"
+                                        required="" /></label>
+                                <div class="grid-2">
+                                    <label>Edad (meses) *<input max="240" min="1" name="edad" required=""
+                                            type="number" /></label><label>Sexo<select name="sexo">
+                                            <option>Macho</option>
+                                            <option>Hembra</option>
+                                        </select></label>
+                                </div>
+                                <label>Personalidad<select name="personalidad">
+                                        <option>Cariñoso</option>
+                                        <option>Curioso</option>
+                                        <option>Juguetón</option>
+                                        <option>Tranquilo</option>
+                                    </select></label><label>Historia *<textarea maxlength="500" name="historia"
+                                        required="" rows="3"></textarea></label><label>Descripción *<textarea
+                                        maxlength="500" name="descripcion" required="" rows="3"></textarea>
+                                </label>
+                                <div class="grid-2">
+                                    <label>Foto de ejemplo<select name="imagen">
+                                            <option value="1">Gatito 1</option>
+                                            <option value="2">Gatito 2</option>
+                                            <option value="3">Gatito 3</option>
+                                            <option value="4">Gatito 4</option>
+                                            <option value="5">Gatito 5</option>
+                                            <option value="6">Gatito 6</option>
+                                            <option value="7">Gatito 7</option>
+                                        </select></label><label>Estado<select name="estado">
+                                            <option value="disponible">En adopción</option>
+                                            <option value="adoptado">Adoptado</option>
+                                            <option value="archivado">Archivado</option>
+                                        </select></label>
+                                </div>
+                                <fieldset>
+                                    <legend>Información médica ilustrativa</legend>
+                                    <label class="check"><input name="vacunas" type="checkbox" /> Vacunado</label><label
+                                        class="check"><input name="esterilizado" type="checkbox" />
+                                        Esterilizado</label><label class="check"><input name="desparasitado"
+                                            type="checkbox" />
+                                        Desparasitado</label>
+                                </fieldset>
+                                <div class="acciones">
+                                    <button class="btn btn-rosa" type="submit">
+                                        Guardar perfil</button><button class="btn btn-outline" hidden=""
+                                        id="cancelar-edicion" type="button">
+                                        Cancelar
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                        <div class="tarjeta-blanca">
+                            <h2>Perfiles existentes</h2>
+                            <div id="gestion-gatos"></div>
+                        </div>
+                    </div>
+                </section>
+                <section class="panel-tab" hidden="" id="tab-solicitudes" role="tabpanel">
+                    <div class="tarjeta-blanca">
+                        <h2>Revisar solicitudes</h2>
+                        <div id="gestion-solicitudes"></div>
+                    </div>
+                </section>
+                <section class="panel-tab" hidden="" id="tab-vets" role="tabpanel">
+                    <div class="gestion-layout">
+                        <div class="tarjeta-blanca">
+                            <h2>Agregar ficha al directorio</h2>
+                            <form class="formulario" id="form-vet">
+                                <label>Nombre *<input maxlength="100" name="nombre" required="" /></label>
+                                <label>Tipo de establecimiento o servicio *<input maxlength="100" name="especialidad"
+                                        required="" /></label>
+                                <label>Dirección o zona *<input maxlength="180" name="zona" required="" /></label>
+                                <label>Contacto *<input maxlength="100" name="contacto" required="" /></label>
+                                <label>Horario<input maxlength="220" name="horario" /></label>
+                                <label>Enlace de Google Maps<input type="url" maxlength="2048" name="maps"
+                                        placeholder="https://maps.app.goo.gl/…" /></label>
+                                <button class="btn btn-rosa" type="submit">
+                                    Guardar ficha
+                                </button>
+                            </form>
+                        </div>
+                        <div class="tarjeta-blanca">
+                            <h2>Contactos registrados</h2>
+                            <div id="gestion-vets"></div>
+                        </div>
+                    </div>
+                </section>
+                <section class="panel-tab" hidden="" id="tab-mensajes" role="tabpanel">
+                    <div class="tarjeta-blanca">
+                        <h2>Mensajes recibidos (demo)</h2>
+                        <div id="gestion-mensajes"></div>
+                    </div>
+                </section>
+                <div class="reinicio">
+                    <button class="btn btn-outline" id="reiniciar-demo" type="button">
+                        ↺ Restablecer todos los datos de ejemplo
+                    </button>
+                </div>
+            </div>
+        </section>
+    </main>
+    <footer class="pie">
+        <div class="contenedor pie-grid">
+            <div>
+                <a class="marca marca-pie" href="index.html"><img alt="" src="img/logo-michi.png" /><span>Tu Michi
+                        <b>Adopción</b></span></a>
+                <p>
+                    Pequeñas huellitas, grandes historias. Promovemos una adopción
+                    informada y responsable.
+                </p>
+            </div>
+            <div>
+                <strong>Explora</strong><a href="adopciones.html">Gatos en adopción</a><a href="blog.html">Consejos de
+                    cuidado</a><a href="veterinarias.html">Directorio veterinario</a>
+            </div>
+            <div>
+                <strong>Conoce el proyecto</strong><a href="nosotros.html">Quiénes somos</a><a href="ayuda.html">Ayuda y
+                    contacto</a><a href="gestion.html">Panel de demostración</a>
+            </div>
+        </div>
+        <div class="pie-final">
+            🐾 Proyecto académico · Prototipo interactivo solo con HTML, CSS y
+            JavaScript · Sin inicio de sesión ni base de datos
+        </div>
+    </footer>
+    <div aria-live="polite" class="toast" hidden="" id="toast" role="status"></div>
+    <script defer="" src="js/datos.js"></script>
+    <script defer="" src="js/app.js"></script>
+</body>
+
+</html>

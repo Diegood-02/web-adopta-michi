@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+
+<html lang="es">
+
+<head>
+      <meta charset="utf-8" />
+      <meta content="width=device-width, initial-scale=1" name="viewport" />
+      <meta content="Prototipo Tu Michi Adopción" name="description" />
+      <meta content="#FFE5B4" name="theme-color" />
+      <title>Inicio | Tu Michi Adopción</title>
+      <link href="img/logo-nuevo.png" rel="icon" type="image/png" />
+      <link href="css/estilos.css" rel="stylesheet" />
+      <link href="css/revision.css" rel="stylesheet" />
+      <link rel="stylesheet" href="css/asistente-michi.css">
+</head>
+
+<body data-pagina="index">
+      <header class="cabecera">
+            <div class="barra contenedor"><a aria-label="Tu Michi Adopción, ir al inicio" class="marca"
+                        href="index.html"><img alt="Logotipo de Tu Michi Adopción" src="img/logo-nuevo.png" /><span>Tu
+                              Michi <b>Adopción</b></span></a><button aria-controls="menu-principal"
+                        aria-expanded="false" class="boton-menu" id="menu-toggle" type="button">☰
+                        <span>Menú</span></button>
+                  <nav aria-label="Navegación principal" id="menu-principal"><a aria-current="page" class="activo"
+                              href="index.html">Inicio</a>
+                        <a href="nosotros.html">Quiénes somos</a>
+                        <a href="adopciones.html">Adopciones</a>
+                        <a href="solicitudes.html">Solicitudes</a>
+                        <a href="ayuda.html">Ayuda</a>
+                        <a href="blog.html">Blog</a>
+                        <a href="veterinarias.html">Veterinarias</a>
+                        <a href="gestion.html">Gestión (demo)</a>
+                  </nav>
+            </div>
+      </header>
+      <main>
+            <section aria-label="Destacados" class="hero hero-cinematico" id="carrusel-inicio">
+                  <div class="contenedor hero-shell">
+                        <span aria-hidden="true" class="hero-decor">✳</span>
+                        <div class="hero-panel activo" data-slide="0">
+                              <div class="hero-texto">
+                                    <span class="pre-titulo">✦ ADOPCIÓN CON PROPÓSITO</span>
+                                    <h1>Pequeñas vidas, <em>grandes encuentros.</em></h1>
+                                    <p>Encuentra a tu nuevo mejor amigo. Conoce su historia, descubre su personalidad y
+                                          comienza una adopción responsable.</p>
+                                    
+                                    <div class="acciones"><a class="btn btn-rosa" href="adopciones.html">Conocer a los
+                                                michis ↗</a><a class="btn btn-outline" href="nosotros.html">Nuestro
+                                                proyecto</a></div>
+                                    
+                              </div>
+                              <div class="hero-visual"><img
+                                          alt="Retrato de gatito blanco con iluminación cinematográfica"
+                                          fetchpriority="high" height="1000" src="img/gato-3.jpg" width="800" />
+                                    <div class="hero-overlay"><span class="overlay-kicker">UNA HISTORIA POR
+                                                DESCUBRIR</span><strong>Un hogar puede cambiarlo todo.</strong></div>
+                                    <span class="hero-sello">♥<small>Adopta</small></span>
+                              </div>
+                        </div>
+                        <div class="hero-panel" data-slide="1" hidden="">
+                              <div class="hero-texto">
+                                    <span class="pre-titulo">✦ CUIDADOS Y BIENESTAR</span>
+                                    <h2>Su felicidad empieza <em>con tus cuidados.</em></h2>
+                                    <p>Aprende a acompañar a tu felino con recomendaciones sobre alimentación, higiene,
+                                          salud y adaptación a un nuevo hogar.</p>
+
+                                    <div class="acciones"><a class="btn btn-rosa" href="blog.html">Explorar el blog
+                                                ↗</a><a class="btn btn-outline" href="ayuda.html">Resolver dudas</a>
+                                    </div>
+
+                              </div>
+                              <div class="hero-visual"><img alt="Retrato cálido de un gatito naranja descansando"
+                                          height="1000" loading="lazy" src="img/gato-8.jpg" width="800" />
+                                    <div class="hero-overlay"><span class="overlay-kicker">PEQUEÑOS GESTOS, GRAN
+                                                BIENESTAR</span><strong>Aprender también es amar.</strong></div><span
+                                          class="hero-sello">✿<small>Cuida</small></span>
+                              </div>
+                        </div>
+                        <div class="hero-panel" data-slide="2" hidden="">
+                              <div class="hero-texto">
+                                    <span class="pre-titulo">✦ UNA RED QUE ACOMPAÑA</span>
+                                    <h2>Cuidamos cada vida <em>en comunidad.</em></h2>
+                                    <p>Conoce las veterinarias aliadas y los recursos de orientación que apoyan la salud
+                                          y el bienestar de nuestros futuros compañeros.</p>
+
+                                    <div class="acciones"><a class="btn btn-rosa" href="veterinarias.html">Ver
+                                                directorio ↗</a><a class="btn btn-outline"
+                                                href="ayuda.html">Contáctanos</a></div>
+
+                              </div>
+                              <div class="hero-visual"><img alt="Gatita tricolor al aire libre" height="1000"
+                                          loading="lazy" src="img/gato-4.jpg" width="800" />
+                                    <div class="hero-overlay"><span class="overlay-kicker">BIENESTAR
+                                                FELINO</span><strong>Una red que cuida sus huellitas.</strong></div>
+                                    <span class="hero-sello">✚<small>Salud</small></span>
+                              </div>
+                        </div>
+                        <div aria-label="Controles del carrusel de inicio" class="hero-control-panel">
+                              <div aria-label="Seleccionar diapositiva" class="hero-puntos" id="hero-puntos"><button
+                                          aria-current="true" aria-label="Ver diapositiva de adopción" class="activo"
+                                          data-ir="0" type="button"></button><button
+                                          aria-label="Ver diapositiva de cuidados" data-ir="1"
+                                          type="button"></button><button aria-label="Ver diapositiva de veterinarias"
+                                          data-ir="2" type="button"></button></div>
+                              <span class="hero-numeracion"><strong id="hero-numero">01</strong> / 03</span>
+                              <div class="hero-flechas"><button aria-label="Diapositiva anterior"
+                                          class="hero-flecha izquierda" id="hero-prev" type="button">←</button><button
+                                          aria-label="Diapositiva siguiente" class="hero-flecha derecha" id="hero-next"
+                                          type="button">→</button></div>
+                        </div>
+                  </div>
+            </section>
+            <section class="bloque lila-suave">
+                  <div class="contenedor">
+                        <div class="titulo-centro"><span class="pre-titulo">♥ ADOPTAR ES AMAR</span>
+                              <h2>¿Por qué adoptar con nosotros?</h2>
+                              <p>Un proyecto comprometido con la adopción responsable y el bienestar felino.</p>
+                        </div>
+                        <div class="grid-3">
+                              <article class="tarjeta-beneficio"><span class="icono-burbuja">♡</span>
+                                    <h3>Adopciones responsables</h3>
+                                    <p>Cada michi cuenta con una ficha informativa y un proceso de solicitud para
+                                          promover decisiones
+                                          conscientes.</p>
+                              </article>
+                              <article class="tarjeta-beneficio"><span class="icono-burbuja">✧</span>
+                                    <h3>Encuentra tu compatibilidad</h3>
+                                    <p>Conoce su edad, personalidad e historia antes de dar el siguiente paso.</p>
+                              </article>
+                              <article class="tarjeta-beneficio"><span class="icono-burbuja">🐾</span>
+                                    <h3>Red de bienestar</h3>
+                                    <p>Consulta recursos de cuidados y un directorio veterinario en preparación.</p>
+                              </article>
+                        </div>
+                  </div>
+            </section>
+            <!-- CONTENIDO MULTIMEDIA: el modelo 3D y el logotipo se integraron de los archivos proporcionados -->
+            <section aria-labelledby="titulo-multimedia" class="bloque multimedia-bloque" id="michi-en-movimiento">
+                  <div class="contenedor">
+                        <div class="titulo-centro">
+                              <span class="pre-titulo">🐾 UNA EXPERIENCIA MÁS CERCANA</span>
+                              <h2 id="titulo-multimedia">Tu Michi, ¡en movimiento!</h2>
+                              <p>Conoce a nuestro gatito en tres dimensiones y descubre el símbolo que representa
+                                    nuestro proyecto.</p>
+                        </div>
+                        <div class="multimedia-grid">
+                              <article class="multimedia-tarjeta">
+                                    <div class="multimedia-marco marco-gatito" id="visor-3d-stage">
+                                          <img alt="Ilustración de referencia del gatito 3D, de colores crema y lila"
+                                                loading="lazy" src="img/gatito-3d-preview.jpg" />
+                                          <div class="marco-3d-accion">
+                                                <button class="btn btn-rosa" id="activar-3d" type="button">🐈 Abrir
+                                                      gatito en 3D</button>
+                                                <span class="marco-pista">Se cargará el modelo interactivo al
+                                                      pulsar</span>
+                                          </div>
+                                    </div>
+                                    <div class="multimedia-contenido">
+                                          <span class="pre-titulo">EXPLORA EN 3D</span>
+                                          <h3>Conoce a nuestro avatar </h3>
+                                          <p>Arrastra para verlo desde diferentes ángulos. Puedes activar o detener su
+                                                giro y regresar a la vista
+                                                inicial.</p>
+                                          <div class="controles-multimedia" hidden="" id="controles-3d">
+                                                <button aria-pressed="true" class="btn-control" id="alternar-giro"
+                                                      type="button">⏸ Detener giro</button>
+                                                <button class="btn-control" id="reiniciar-camara" type="button">↺
+                                                      Restablecer vista</button>
+                                          </div>
+                                          <p aria-live="polite" class="mensaje-3d" id="mensaje-3d" role="status">El
+                                                modelo 3D se carga solo cuando
+                                                lo solicitas.</p>
+                                    </div>
+                              </article>
+                              <article class="multimedia-tarjeta">
+                                    <div class="multimedia-marco marco-logo">
+                                          <video aria-label="Logotipo animado: dos gatos se acercan con un corazón entre ellos"
+                                                class="video-logo" loop="" muted="" playsinline=""
+                                                poster="img/logo-animado-poster.jpg" preload="metadata"
+                                                src="videos/logo-animado.mp4"></video>
+                                    </div>
+                                    <div class="multimedia-contenido">
+                                          <span class="pre-titulo">NUESTRA IDENTIDAD</span>
+                                          <h3>Dos gatitos, un mismo corazón</h3>
+                                          <p>El símbolo de Tu Michi Adopción cobra vida para expresar el vínculo entre
+                                                los felinos y sus futuras
+                                                familias.</p>
+                                          <div class="controles-multimedia">
+                                                <button aria-pressed="false" class="btn-control alternar-video"
+                                                      type="button">⏸ Pausar
+                                                      animación</button>
+                                                <a class="btn btn-lila" href="nosotros.html">Conoce nuestra historia</a>
+                                          </div>
+                                    </div>
+                              </article>
+                        </div>
+                  </div>
+            </section>
+            <section aria-labelledby="titulo-huellas" class="bloque huellas-marquee" id="huellas-hogar">
+                  <div class="contenedor">
+                        <div class="cabecera-seccion">
+                              <div><span class="pre-titulo">✦ CONOCE A TU COMPAÑERO</span>
+                                    <h2 id="titulo-huellas">Pequeñas huellas que buscan hogar</h2>
+                                    <p>Descubre a los gatitos disponibles. Detén el movimiento cuando quieras y elige a
+                                          quién conocer.</p>
+                              </div><button aria-controls="michis-destacados" aria-pressed="false"
+                                    class="btn-control marquee-boton" id="pausar-marquee" type="button">⏸ Pausar
+                                    carrusel</button>
+                        </div>
+                  </div>
+                  <div aria-label="Gatitos destacados en adopción" class="marquee-wrapper" id="michis-destacados"
+                        role="region" tabindex="0">
+                        <div class="marquee-content scrollingX" id="marquee-track"></div>
+                  </div>
+                  <div class="contenedor">
+                        <p class="centrar margen-superior"><a class="btn btn-rosa" href="adopciones.html">🐾 Ver todos
+                                    los gatitos</a></p>
+                  </div>
+            </section>
+            <section class="bloque crema-suave">
+                  <div class="contenedor">
+                        <div class="titulo-centro"><span class="pre-titulo">UN CAMINO LLENO DE CARIÑO</span>
+                              <h2>Adoptar es más sencillo de lo que imaginas</h2>
+                        </div>
+                        <div class="grid-3 pasos">
+                              <article>
+                                    <div class="paso-num">01</div>
+                                    <h3>Conoce</h3>
+                                    <p>Explora las fichas y descubre qué gatito puede adaptarse a tu hogar.</p>
+                              </article>
+                              <article>
+                                    <div class="paso-num">02</div>
+                                    <h3>Solicita</h3>
+                                    <p>Llena el formulario de adopción de muestra para practicar el proceso.</p>
+                              </article>
+                              <article>
+                                    <div class="paso-num">03</div>
+                                    <h3>Da seguimiento</h3>
+                                    <p>Revisa tu solicitud y su estado en la sección correspondiente.</p>
+                              </article>
+                        </div>
+                  </div>
+            </section>
+            <section class="bloque">
+                  <div class="contenedor banda-cuidado"><img alt="Gatita curiosa con ojos grandes" loading="lazy"
+                              src="img/gato_blog.jpg" />
+                        <div><span class="pre-titulo">HOGARES FELICES</span>
+                              <h2>Un michi feliz comienza con buenos cuidados</h2>
+                              <p>Encuentra información introductoria sobre alimentación, higiene, salud y cómo preparar
+                                    tu casa.</p><a class="btn btn-rosa" href="blog.html">Explorar el blog</a>
+                        </div><span aria-hidden="true" class="huella banda-huella">🐾</span>
+                  </div>
+            </section>
+      </main>
+      <footer class="pie">
+            <div class="contenedor pie-grid">
+                  <div><a class="marca marca-pie" href="index.html"><img alt="" src="img/logo-nuevo.png" /><span>Tu
+                                    Michi
+                                    <b>Adopción</b></span></a>
+                        <p>Pequeñas huellitas, grandes historias. Promovemos una adopción informada y responsable.</p>
+                  </div>
+                  <div><strong>Explora</strong><a href="adopciones.html">Gatos en adopción</a><a
+                              href="blog.html">Consejos de
+                              cuidado</a><a href="veterinarias.html">Veterinarias aliadas</a></div>
+                  <div><strong>Conoce el proyecto</strong><a href="nosotros.html">Quiénes somos</a><a
+                              href="ayuda.html">Ayuda y
+                              contacto</a><a href="gestion.html">Panel de demostración</a></div>
+            </div>
+            <div class="pie-final">🐾 Proyecto académico · Prototipo interactivo solo con HTML, CSS y JavaScript · Sin
+                  inicio de
+                  sesión ni base de datos</div>
+      </footer>
+      <div aria-live="polite" class="toast" hidden="" id="toast" role="status"></div>
+      <script defer="" src="js/datos.js"></script>
+      <script defer="" src="js/app.js"></script>
+      <script defer="" src="js/animaciones.js"></script>
+      <script defer src="js/asistente-michi.js"></script>
+</body>
+
+</html>

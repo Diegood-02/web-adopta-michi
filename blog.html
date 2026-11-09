@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+
+<html lang="es">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1" name="viewport" />
+    <meta content="Prototipo Tu Michi Adopción" name="description" />
+    <meta content="#FFE5B4" name="theme-color" />
+    <title>Blog de cuidados | Tu Michi Adopción</title>
+    <link href="img/logo-michi.png" rel="icon" type="image/png" />
+    <link href="css/estilos.css" rel="stylesheet" />
+    <link href="css/revision.css" rel="stylesheet" />
+</head>
+
+<body data-pagina="blog">
+    <header class="cabecera">
+        <div class="barra contenedor"><a aria-label="Tu Michi Adopción, ir al inicio" class="marca"
+                href="index.html"><img alt="Logotipo de Tu Michi Adopción" src="img/logo-michi.png" /><span>Tu Michi
+                    <b>Adopción</b></span></a><button aria-controls="menu-principal" aria-expanded="false"
+                class="boton-menu" id="menu-toggle" type="button">☰
+                <span>Menú</span></button>
+            <nav aria-label="Navegación principal" id="menu-principal"><a href="index.html">Inicio</a>
+                <a href="nosotros.html">Quiénes somos</a>
+                <a href="adopciones.html">Adopciones</a>
+                <a href="solicitudes.html">Solicitudes</a>
+                <a href="ayuda.html">Ayuda</a>
+                <a aria-current="page" class="activo" href="blog.html">Blog</a>
+                <a href="veterinarias.html">Veterinarias</a>
+                <a href="gestion.html">Gestión (demo)</a>
+            </nav>
+        </div>
+    </header>
+    <main>
+        <section class="pagina-intro">
+            <div class="contenedor"><span class="pre-titulo">🌿 CUIDADOS CON AMOR</span>
+                <h1>Aprende sobre bienestar felino</h1>
+                <p>Artículos introductorios sobre salud, adaptación y comportamiento para que cuides mejor a tu michi.
+                </p>
+            </div>
+        </section>
+        <section class="bloque">
+            <div class="contenedor">
+                <div id="blog-destacado"></div>
+                <div class="cabecera-seccion">
+                    <div><span class="pre-titulo">APRENDE CADA DÍA</span>
+                        <h2>Más consejos de cuidado</h2>
+                    </div>
+                </div>
+                <div class="grid-3" id="blog-grid"></div>
+            </div>
+        </section>
+    </main>
+    <footer class="pie">
+        <div class="contenedor pie-grid">
+            <div><a class="marca marca-pie" href="index.html"><img alt="" src="img/logo-michi.png" /><span>Tu Michi
+                        <b>Adopción</b></span></a>
+                <p>Pequeñas huellitas, grandes historias. Promovemos una adopción informada y responsable.</p>
+            </div>
+            <div><strong>Explora</strong><a href="adopciones.html">Gatos en adopción</a><a href="blog.html">Consejos de
+                    cuidado</a><a href="veterinarias.html">Veterinarias aliadas</a></div>
+            <div><strong>Conoce el proyecto</strong><a href="nosotros.html">Quiénes somos</a><a href="ayuda.html">Ayuda
+                    y contacto</a><a href="gestion.html">Panel de demostración</a></div>
+        </div>
+        <div class="pie-final">🐾 Proyecto académico · Prototipo interactivo solo con HTML, CSS y JavaScript · Sin
+            inicio de sesión ni base de datos</div>
+    </footer>
+    <div aria-live="polite" class="toast" hidden="" id="toast" role="status"></div>
+    <script defer="" src="js/datos.js"></script>
+    <script defer="" src="js/app.js"></script>
+</body>
+
+</html>
