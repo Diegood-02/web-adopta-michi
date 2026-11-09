@@ -129,7 +129,7 @@
         titulo: v.nombre,
         texto: `${v.especialidad} ${v.zona} ${v.horario} ${v.contacto}`,
         campos: {
-          horario: `${v.nombre}: horario: ${v.horario}`,
+          horario: `Horario de ${v.nombre}: ${v.horario}`,
           ubicacion: `${v.nombre}: ${v.zona}. Puedes abrir la ubicación en Google Maps desde Veterinarias.`,
           contacto: `${v.nombre}: teléfono ${v.contacto}.`,
         },
