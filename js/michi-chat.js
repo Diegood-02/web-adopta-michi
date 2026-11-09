@@ -1,5 +1,6 @@
 /* Motor del chat de Michi: búsqueda local por palabras clave sobre el contenido publicado del sitio.
-   Sin modelos de IA ni servidor. Solo responde con información que ya aparece en el sitio. */
+   Sin modelos de IA ni servidor. Solo responde con información que ya aparece en el sitio.
+   Devuelve { texto, enlace } y recuerda el último gato, veterinaria o artículo para preguntas de seguimiento. */
 "use strict";
 
 (() => {
@@ -54,6 +55,16 @@
   const GENERICOS = new Set(["veterinaria", "gato", "horario", "ubicacion", "contacto", "cuidado", "adopcion", "animal", "horas"]);
   // Términos que indican que la pregunta es del tema del sitio (sin ellos, se responde que no hay información).
   const SIN_DOMINIO = new Set(["costo", "disponible", "saludo", "gracias"]);
+  // Si la pregunta trae uno de estos temas, ya no es un seguimiento de la conversación anterior.
+  const TEMAS_NUEVOS = new Set(["gato", "veterinaria", "disponible", "solicitud", "requisito", "adopcion", "cuidado", "sitio", "saludo", "gracias"]);
+
+  // Enlaces a páginas del propio sitio (o a Google Maps, como ya aparece en el directorio).
+  const ENLACE = {
+    adopciones: { href: "adopciones.html", texto: "Ver gatos en adopción" },
+    solicitudes: { href: "solicitudes.html", texto: "Ver mis solicitudes" },
+    veterinarias: { href: "veterinarias.html", texto: "Ver veterinarias" },
+  };
+  const R = (texto, enlace = null) => ({ texto, enlace });
 
   const tokens = (texto) =>
     norm(texto)
@@ -101,6 +112,7 @@
       ].join(" ");
       agregar({
         tipo: "gato",
+        gato: g,
         titulo: g.nombre,
         texto: `${g.descripcion} ${g.historia} ${g.personalidad} ${g.sexo} ${estado}`,
         etiquetas: "gato gatito michi",
@@ -108,6 +120,7 @@
           `${g.nombre}: ${g.sexo.toLowerCase()}, ${meses(g.edad)}, ${g.personalidad.toLowerCase()}. ` +
           `${g.descripcion} Vacunado: ${si(g.vacunas)} · Esterilizado: ${si(g.esterilizado)} · ` +
           `Desparasitado: ${si(g.desparasitado)}. Lo encuentras en la página Adopciones.`,
+        enlace: { href: `gato.html?id=${g.id}`, texto: `Ver ficha de ${g.nombre}` },
       });
     }
 
@@ -121,19 +134,22 @@
         "Estos michis están disponibles para adopción: " +
         S.gatos.map((g) => `${g.nombre} (${g.personalidad.toLowerCase()})`).join(", ") +
         ". Entra a su ficha en Adopciones para conocer su historia.",
+      enlace: ENLACE.adopciones,
     });
 
     for (const v of S.veterinarias) {
       agregar({
         tipo: "veterinaria",
+        vet: v,
         titulo: v.nombre,
         texto: `${v.especialidad} ${v.zona} ${v.horario} ${v.contacto}`,
         campos: {
-          horario: `Horario de ${v.nombre}: ${v.horario}`,
-          ubicacion: `${v.nombre}: ${v.zona}. Puedes abrir la ubicación en Google Maps desde Veterinarias.`,
-          contacto: `${v.nombre}: teléfono ${v.contacto}.`,
+          horario: R(`Horario de ${v.nombre}: ${v.horario}`, ENLACE.veterinarias),
+          ubicacion: R(`${v.nombre}: ${v.zona}.`, { href: v.maps, texto: "Abrir en Google Maps" }),
+          contacto: R(`${v.nombre}: teléfono ${v.contacto}.`, ENLACE.veterinarias),
         },
         respuesta: `${v.nombre} (${v.especialidad.toLowerCase()}). Zona: ${v.zona}. Horario: ${v.horario} Contacto: ${v.contacto}.`,
+        enlace: ENLACE.veterinarias,
       });
     }
     agregar({
@@ -145,6 +161,7 @@
         "Estas veterinarias aparecen en el directorio: " +
         S.veterinarias.map((v) => v.nombre).join(", ") +
         ". Pregúntame por el nombre para ver su horario, ubicación o contacto.",
+      enlace: ENLACE.veterinarias,
     });
 
     for (const [id, a] of Object.entries(A)) {
@@ -158,7 +175,7 @@
         titulo: a.titulo,
         texto: `${a.categoria} ${cuerpo}`,
         respuesta: `${a.resumen} ${(a.parrafos || []).slice(0, 2).join(" ")} ${fuente}`,
-        url: `articulo.html?id=${id}`,
+        enlace: { href: `articulo.html?id=${id}`, texto: "Leer artículo" },
       });
     }
 
@@ -169,36 +186,42 @@
         texto: "adoptar adopcion solicitar proceso pasos ficha formulario",
         respuesta:
           "Abre Adopciones, elige un gatito, entra a su ficha y pulsa “Solicitar adopción”. Es una solicitud de prueba: no se envía a ningún refugio.",
+        enlace: ENLACE.adopciones,
       },
       {
         titulo: "Requisitos del formulario",
         texto: "requisito requisitos adoptar adopcion mayor 18 edad formulario telefono correo direccion mascotas experiencia acuerdo motivo",
         respuesta:
           "El formulario pide nombre, edad (mayor de 18 años), teléfono, correo, dirección general, si tienes otras mascotas, si has tenido gatos antes, si todas las personas del hogar están de acuerdo y por qué quieres adoptar. Los datos son de prueba y se guardan solo en tu navegador.",
+        enlace: ENLACE.adopciones,
       },
       {
         titulo: "Estado de mi solicitud",
         texto: "solicitud estado revision folio aprobado rechazado",
         respuesta:
           "Puedes revisar las solicitudes en la página Solicitudes. En Gestión (demo) es posible simular su aprobación o rechazo.",
+        enlace: ENLACE.solicitudes,
       },
       {
         titulo: "Costos de adopción",
         texto: "costo costos precio cuesta pagar gratis tarifa cuanto",
         respuesta:
           "Este sitio no publica costos de adopción, así que no tengo esa información.",
+        enlace: ENLACE.adopciones,
       },
       {
         titulo: "Sobre este proyecto",
         texto: "sitio proyecto prototipo academico real demo base datos cuentas inicio sesion",
         respuesta:
           "Tu Michi Adopción es un proyecto académico: un prototipo interactivo con HTML, CSS y JavaScript. No tiene inicio de sesión ni base de datos, y las solicitudes son de prueba.",
+        enlace: null,
       },
       {
         titulo: "Ayuda y contacto",
         texto: "contacto ayuda escribir mensaje correo duda contactar",
         respuesta:
           "En Ayuda y contacto puedes dejar un mensaje de prueba. Los mensajes no se envían: se guardan en el panel de Gestión (demo).",
+        enlace: null,
       },
     ];
     for (const f of faq) agregar({ tipo: "faq", ...f });
@@ -206,11 +229,12 @@
     return fragmentos;
   }
 
-  // ---------- Búsqueda: puntuación tipo TF-IDF con bonus por título ----------
+  // ---------- Búsqueda: BM25 con bonus por título ----------
 
   let indice = null;
+  // Último gato, veterinaria o artículo del que se respondió; sirve para preguntas de seguimiento.
+  let ultimo = null;
 
-  // BM25: favorece fragmentos cortos y enfocados sobre textos largos que repiten la palabra.
   function prepararIndice() {
     const fragmentos = construirFragmentos();
     const N = fragmentos.length;
@@ -259,24 +283,66 @@
   const SINTOMAS = /\b(vomit\w*|diarre\w*|sangr\w*|convulsi\w*|respira\w*|herid\w*|fiebre|envenen\w*|atropell\w*|letarg\w*|desmay\w*|cojea\w*|tos|estornud\w*|golpe\w*|no come|no orina|no defeca)\b/;
   const DATOS_PERSONALES = /[\w.+-]+@[\w-]+\.[a-z]{2,}|\+?\d[\d\s-]{8,}\d|\b(curp|rfc|contrasena|password|tarjeta|cuenta bancaria)\b/i;
 
+  // ---------- Respuestas por ficha ----------
+
+  // Responde solo si la pregunta pide un dato concreto del gato; si no, devuelve null.
+  function campoGato(g, n) {
+    const ficha = { href: `gato.html?id=${g.id}`, texto: `Ver ficha de ${g.nombre}` };
+    if (/costo|cuesta|precio|pagar|cuanto vale/.test(n))
+      return R("Este sitio no publica costos de adopción, así que no tengo esa información.", ENLACE.adopciones);
+    if (/vacun/.test(n)) return R(`${g.nombre}: vacunado: ${si(g.vacunas)}.`, ficha);
+    if (/esteril|castr/.test(n)) return R(`${g.nombre}: esterilizado: ${si(g.esterilizado)}.`, ficha);
+    if (/desparas/.test(n)) return R(`${g.nombre}: desparasitado: ${si(g.desparasitado)}.`, ficha);
+    if (/anos|edad|meses|cumple|cuanto tiene/.test(n)) return R(`${g.nombre} tiene ${meses(g.edad)}.`, ficha);
+    if (/personalidad|caracter|como es/.test(n)) return R(`${g.nombre} es ${g.personalidad.toLowerCase()}. ${g.descripcion}`, ficha);
+    if (/historia|llego|paso|vida/.test(n)) return R(`${g.nombre}: ${g.historia}`, ficha);
+    return null;
+  }
+
+  // Responde solo si la pregunta pide horario, ubicación o contacto; si no, devuelve null.
+  function campoVet(f, n) {
+    if (/horario|abre|abierto|cierra|hora/.test(n)) return f.campos.horario;
+    if (/donde|ubicac|direccion|zona|mapa|llegar|cerca|queda/.test(n)) return f.campos.ubicacion;
+    if (/telefono|contacto|llamar|correo|whatsapp|celular/.test(n)) return f.campos.contacto;
+    return null;
+  }
+
+  function fichaCompleta(f) {
+    return R(recortar(f.respuesta, LIMITE_RESPUESTA), f.enlace);
+  }
+
+  function esSeguimiento(n, q) {
+    const empieza = /^\s*¿?\s*(y|tambien|pues|entonces)\b/.test(n);
+    const pronombre = /\b(su|sus|ella|eso|esa|ese|lo|la)\b/.test(n);
+    return (empieza || pronombre) && !q.some((t) => TEMAS_NUEVOS.has(t));
+  }
+
   // ---------- Respuesta ----------
 
-  function respuesta(pregunta) {
+  function responder(pregunta) {
     const texto = String(pregunta ?? "").trim();
-    if (!texto) return "Escribe tu pregunta y con gusto te ayudo.";
+    if (!texto) return R("Escribe tu pregunta y con gusto te ayudo.");
     if (DATOS_PERSONALES.test(texto))
-      return "Por tu privacidad, no escribas correos, teléfonos ni datos personales en este chat.";
-    if (SINTOMAS.test(norm(texto)))
-      return "No puedo evaluar la salud de tu gato. Si tiene vómito, diarrea persistente, dificultad para respirar, sangrado, convulsiones o deja de comer, acude pronto con un veterinario. En Veterinarias puedes ver opciones del directorio.";
+      return R("Por tu privacidad, no escribas correos, teléfonos ni datos personales en este chat.");
+
+    const n = norm(texto);
+    if (SINTOMAS.test(n))
+      return R(
+        "No puedo evaluar la salud de tu gato. Si tiene vómito, diarrea persistente, dificultad para respirar, sangrado, convulsiones o deja de comer, acude pronto con un veterinario. En Veterinarias puedes ver opciones del directorio.",
+        ENLACE.veterinarias,
+      );
 
     const { q, ranking } = buscar(texto);
-    const NO_SE =
-      "No encuentro esa información en el sitio. Puedo ayudarte con adopciones, solicitudes, cuidados, gatos en adopción y veterinarias.";
+    const NO_SE = R(
+      "No encuentro esa información en el sitio. Puedo ayudarte con adopciones, solicitudes, cuidados, gatos en adopción y veterinarias.",
+    );
 
     if (q.length && q.every((t) => t === "saludo" || t === "gracias")) {
-      return q.includes("saludo")
-        ? "¡Miau! 🐾 Puedo ayudarte con adopciones, solicitudes, cuidados, gatos en adopción y veterinarias."
-        : "¡De nada! 🐾 ¿Quieres saber algo más de adopciones o cuidados?";
+      return R(
+        q.includes("saludo")
+          ? "¡Miau! 🐾 Puedo ayudarte con adopciones, solicitudes, cuidados, gatos en adopción y veterinarias."
+          : "¡De nada! 🐾 ¿Quieres saber algo más de adopciones o cuidados?",
+      );
     }
 
     // 1) Si la pregunta nombra a un gato o a una veterinaria, responde sobre esa ficha.
@@ -286,46 +352,51 @@
         (f.tipo === "gato" || f.tipo === "veterinaria") &&
         distintivos(f).some((t) => q.includes(t)),
     );
-    if (entidad) return responderEntidad(entidad.f, texto);
+    if (entidad) {
+      const f = entidad.f;
+      ultimo = f;
+      const campo = f.tipo === "gato" ? campoGato(f.gato, n) : campoVet(f, n);
+      return campo ?? fichaCompleta(f);
+    }
 
-    // 2) Sin tema del sitio en la pregunta, no se busca nada.
+    // 2) Pregunta de seguimiento ("¿y cuánto cuesta?", "¿y su historia?") sobre la ficha anterior.
+    const pocasPalabras = q.length <= 3 && !q.some((t) => TEMAS_NUEVOS.has(t));
+    if (ultimo && ultimo.tipo !== "articulo" && (esSeguimiento(n, q) || pocasPalabras)) {
+      const campo = ultimo.tipo === "gato" ? campoGato(ultimo.gato, n) : campoVet(ultimo, n);
+      if (campo) return campo;
+    }
+
+    // 3) Sin tema del sitio en la pregunta, no se busca nada.
     const dominio = [...indice.nombres, ...Object.keys(SINONIMOS)].filter(
       (t) => !SIN_DOMINIO.has(t),
     );
     if (!q.some((t) => dominio.includes(t))) return NO_SE;
 
-    // 3) "Gatos esterilizados" o "gatos vacunados": lista filtrada.
+    // 4) "Gatos esterilizados" o "gatos vacunados": lista filtrada.
     const S = window.MICHI_SEMILLA;
     const soloEstado = q.every((t) => ["gato", "esterilizacion", "vacuna", "disponible"].includes(t));
     if (soloEstado && q.includes("gato") && (q.includes("esterilizacion") || q.includes("vacuna"))) {
+      ultimo = null;
       const esterilizados = q.includes("esterilizacion");
       const cumplen = S.gatos.filter((g) => (esterilizados ? g.esterilizado : g.vacunas));
       const etiqueta = esterilizados ? "esterilizados" : "vacunados";
       return cumplen.length
-        ? `Gatos ${etiqueta} en adopción: ${cumplen.map((g) => g.nombre).join(", ")}. Entra a su ficha en Adopciones para conocer más.`
-        : `Por ahora no hay gatos ${etiqueta} registrados en el sitio.`;
+        ? R(`Gatos ${etiqueta} en adopción: ${cumplen.map((g) => g.nombre).join(", ")}. Entra a su ficha en Adopciones para conocer más.`, ENLACE.adopciones)
+        : R(`Por ahora no hay gatos ${etiqueta} registrados en el sitio.`);
     }
 
-    // 4) Preguntas generales sobre veterinarias: directorio completo.
+    // 5) Preguntas generales sobre veterinarias: directorio completo.
     if (q.includes("veterinaria")) {
-      return ranking.find(({ f }) => f.tipo === "lista-veterinarias").f.respuesta;
+      ultimo = null;
+      return fichaCompleta(ranking.find(({ f }) => f.tipo === "lista-veterinarias").f);
     }
 
-    // 5) Mejor fragmento general.
+    // 6) Mejor fragmento general.
     const mejor = ranking[0];
     if (!mejor || mejor.s < UMBRAL) return NO_SE;
-    return recortar(mejor.f.respuesta, LIMITE_RESPUESTA);
+    ultimo = mejor.f.tipo === "articulo" ? mejor.f : null;
+    return fichaCompleta(mejor.f);
   }
 
-  function responderEntidad(f, texto) {
-    if (f.tipo === "veterinaria") {
-      const n = norm(texto);
-      if (/horario|abre|abierto|cierra|hora/.test(n)) return f.campos.horario;
-      if (/donde|ubicac|direccion|zona|mapa|llegar|cerca|queda/.test(n)) return f.campos.ubicacion;
-      if (/telefono|contacto|llamar|correo|whatsapp|celular/.test(n)) return f.campos.contacto;
-    }
-    return recortar(f.respuesta, LIMITE_RESPUESTA);
-  }
-
-  window.MICHI_RESPONDER = respuesta;
+  window.MICHI_RESPONDER = responder;
 })();

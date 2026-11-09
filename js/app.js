@@ -527,14 +527,25 @@
   function respuestaChat(p) {
     return window.MICHI_RESPONDER
       ? window.MICHI_RESPONDER(p)
-      : "El asistente todavía se está cargando. Intenta de nuevo en unos segundos.";
+      : { texto: "El asistente todavía se está cargando. Intenta de nuevo en unos segundos.", enlace: null };
   }
   function initAyuda() {
     const dialogo = $("#chat-conversacion");
-    function agregar(texto, yo) {
+    function agregar(texto, yo, enlace = null) {
       const div = document.createElement("div");
       div.className = `burbuja ${yo ? "yo" : ""}`;
       div.textContent = texto;
+      if (enlace) {
+        const a = document.createElement("a");
+        a.className = "texto-enlace";
+        a.href = enlace.href;
+        a.textContent = `${enlace.texto} →`;
+        if (/^https?:/.test(enlace.href)) {
+          a.target = "_blank";
+          a.rel = "noopener noreferrer";
+        }
+        div.append(document.createElement("br"), a);
+      }
       dialogo.append(div);
       dialogo.scrollTop = dialogo.scrollHeight;
     }
@@ -542,7 +553,8 @@
       const q = String(t).trim().slice(0, 240);
       if (!q) return;
       agregar(q, true);
-      agregar(respuestaChat(q), false);
+      const r = respuestaChat(q);
+      agregar(r.texto, false, r.enlace);
     }
     agregar(
       "¡Hola! Soy Michi 🐱. Puedes preguntar por adopciones, solicitudes, veterinarias o cuidados.",
