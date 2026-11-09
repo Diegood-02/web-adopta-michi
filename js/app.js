@@ -3,6 +3,11 @@
 (() => {
   const CLAVE = "tu_michi_adopcion_multipagina_v1";
   const pagina = document.body.dataset.pagina;
+  if (["index", "ayuda"].includes(pagina) && !window.MICHI_RESPONDER) {
+    const motorChat = document.createElement("script");
+    motorChat.src = "js/michi-chat.js";
+    document.head.append(motorChat);
+  }
   const $ = (s, root = document) => root.querySelector(s);
   const $$ = (s, root = document) => [...root.querySelectorAll(s)];
   const clonar = (x) => JSON.parse(JSON.stringify(x));
@@ -520,18 +525,9 @@
     dibujar();
   }
   function respuestaChat(p) {
-    const q = normalizarBusqueda(p);
-    if (/adop|formulario|requisito/.test(q))
-      return "Abre Adopciones, elige un gatito, entra a su ficha y pulsa “Solicitar adopción”. Es una solicitud de prueba, no se envía a un refugio.";
-    if (/solicitud|estado|folio|revision/.test(q))
-      return "Puedes revisar las solicitudes en la página Solicitudes. En Gestión (demo) es posible simular su aprobación o rechazo.";
-    if (/veterin|clinica|salud/.test(q))
-      return "En Veterinarias puedes buscar por nombre o ubicación. Las fichas del directorio incluyen los datos publicados y un enlace para llegar con Google Maps.";
-    if (/cuid|comida|alimenta|cas[a]?/.test(q))
-      return "Te recomiendo explorar nuestro Blog: encontrarás artículos sobre bienestar, adaptación y salud felina.";
-    if (/hola|gracias|buen/.test(q))
-      return "¡Miau! 🐾 Estoy aquí para ayudarte con adopciones, solicitudes, cuidados o el directorio veterinario.";
-    return "Por ahora puedo responder preguntas frecuentes sobre adopciones, estado de solicitudes, cuidados y veterinarias. ¿Qué te interesa?";
+    return window.MICHI_RESPONDER
+      ? window.MICHI_RESPONDER(p)
+      : "El asistente todavía se está cargando. Intenta de nuevo en unos segundos.";
   }
   function initAyuda() {
     const dialogo = $("#chat-conversacion");
