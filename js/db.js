@@ -19,19 +19,25 @@
     [/invalid login credentials/i, "Correo o contraseña incorrectos."],
     [/email not confirmed/i, "Primero confirma tu correo con el enlace que te enviamos."],
     [/user already registered/i, "Ese correo ya tiene una cuenta. Prueba iniciar sesión."],
-    [/password should be at least|weak.password|password.*(short|weak)/i, "La contraseña es muy débil. Usa al menos 8 caracteres con letras y números."],
+    [/password should be at least|weak.password|password.*(short|weak)/i, "La contraseña necesita al menos 8 caracteres, con mayúsculas, minúsculas, números y un símbolo."],
     [/rate limit|too many|over_email_send_rate_limit/i, "Demasiados intentos. Espera unos minutos e inténtalo de nuevo."],
     [/same password/i, "La nueva contraseña debe ser distinta a la anterior."],
     [/row-level security|42501|permission denied|no autorizado/i, "No tienes permiso para hacer esto."],
     [/duplicate key|solicitudes_unica_pendiente/i, "Ya tienes una solicitud pendiente para este michi."],
     [/failed to fetch|networkerror|load failed/i, "No pudimos conectar con el servidor. Revisa tu internet."],
+    [/error sending|sending.*(email|confirmation|correo)|smtp/i, "No pudimos enviar el correo de confirmación. Espera un momento e intenta de nuevo."],
+    [/email.*(invalid|not allowed)|invalid.*email|email address/i, "Revisa que el correo esté bien escrito."],
+    [/password.*(contain|require|character|uppercase|lowercase|digit|number|symbol)/i, "La contraseña necesita al menos 8 caracteres, con mayúsculas, minúsculas, números y un símbolo."],
+    [/signup.*disabled|signups? not allowed/i, "El registro de cuentas nuevas está desactivado en este momento."],
   ];
   const traducir = (error) => {
     const texto = String(error?.message || error || "");
     for (const [re, msg] of MENSAJES) if (re.test(texto)) return msg;
     // Mensajes que escribimos nosotros en la base (P0001) ya vienen en español.
     if (error?.code === "P0001") return texto;
-    return "Ocurrió un error. Inténtalo de nuevo.";
+    // Si no reconocemos el error, mostramos el mensaje real para poder corregirlo.
+    console.error("Supabase:", error);
+    return texto ? `No se pudo completar la acción: ${texto}` : "Ocurrió un error. Inténtalo de nuevo.";
   };
   const ok = ({ data, error }) => {
     if (error) throw new Error(traducir(error));
