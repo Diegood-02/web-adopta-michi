@@ -5,7 +5,7 @@
 <head>
     <meta charset="utf-8" />
     <meta content="width=device-width, initial-scale=1" name="viewport" />
-    <meta content="Prototipo Tu Michi Adopción" name="description" />
+    <meta content="Tu Michi Adopción, adopción responsable de gatos" name="description" />
     <meta content="#FFE5B4" name="theme-color" />
     <title>Ayuda y contacto | Tu Michi Adopción</title>
     <link href="img/logo-michi.png" rel="icon" type="image/png" />
@@ -30,7 +30,7 @@
                 <a aria-current="page" class="activo" href="ayuda.html">Ayuda</a>
                 <a href="blog.html">Blog</a>
                 <a href="veterinarias.html">Veterinarias</a>
-                <a href="gestion.html">Gestión (demo)</a>
+                <a href="gestion.html">Gestión</a>
             </nav>
         </div>
     </header>
@@ -40,7 +40,7 @@
                 <span class="pre-titulo">💌 SIEMPRE HAY ALGUIEN PARA AYUDAR</span>
                 <h1>Ayuda y contacto</h1>
                 <p>
-                    Resuelve tus dudas de adopción y prueba nuestro asistente de
+                    Resuelve tus dudas de adopción y pregunta a nuestro asistente de
                     preguntas frecuentes.
                 </p>
             </div>
@@ -53,7 +53,7 @@
                             <div class="chat-icono">🐱</div>
                             <div>
                                 <h2>Asistente Michi</h2>
-                                <p>Respuestas automáticas de demostración</p>
+                                <p>Respuestas automáticas</p>
                             </div>
                         </div>
                         <div aria-live="polite" class="chat-conversacion" id="chat-conversacion" role="log"></div>
@@ -75,13 +75,12 @@
                         <span class="pre-titulo">✉ ESCRÍBENOS</span>
                         <h2>Contacto</h2>
                         <p class="nota-demo">
-                            Tus mensajes de prueba no se envían. Utiliza datos ficticios y
-                            consúltalos en el panel de Gestión.
+                            Para enviar un mensaje necesitas iniciar sesión. El equipo del refugio lo revisa desde Gestión.
                         </p>
                         <form class="formulario" id="form-contacto">
-                            <label>Nombre *<input maxlength="80" name="nombre" placeholder="Nombre de prueba"
+                            <label>Nombre *<input maxlength="80" name="nombre" placeholder="Tu nombre"
                                     required="" /></label><label>Correo *<input maxlength="100" name="correo"
-                                    placeholder="demo@ejemplo.com" required=""
+                                    placeholder="tu@correo.com" required=""
                                     type="email" /></label><label>Motivo<select name="motivo">
                                     <option>Adopciones</option>
                                     <option>Cuidados</option>
@@ -89,7 +88,7 @@
                                 </select></label><label>Mensaje *<textarea maxlength="800" name="mensaje"
                                     placeholder="Tu consulta..." required="" rows="5"></textarea></label><button
                                 class="btn btn-rosa" type="submit">
-                                Guardar mensaje de prueba
+                                Enviar mensaje
                             </button>
                         </form>
                     </div>
@@ -113,16 +112,14 @@
             </div>
             <div>
                 <strong>Conoce el proyecto</strong><a href="nosotros.html">Quiénes somos</a><a href="ayuda.html">Ayuda y
-                    contacto</a><a href="gestion.html">Panel de demostración</a>
+                    contacto</a><a href="gestion.html">Gestión</a>
             </div>
         </div>
         <div class="pie-final">
-            🐾 Proyecto académico · Prototipo interactivo solo con HTML, CSS y
-            JavaScript · Sin inicio de sesión ni base de datos
-        </div>
+            🐾 Tu Michi Adopción · Adopción informada y responsable</div>
     </footer>
     <div aria-live="polite" class="toast" hidden="" id="toast" role="status"></div>
-    <script defer="" src="js/datos.js"></script>
+    <script defer="" src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js" integrity="sha384-0w2KAL2YHP6wKOkUDzkCDGgVvfmHnj02DHeQ6XcHOgTfFsGyonKOpShMH1x6nk9o" crossorigin="anonymous"></script><script defer="" src="js/supabase-config.js"></script><script defer="" src="js/db.js"></script><script defer="" src="js/datos.js"></script>
     <script defer="" src="js/app.js"></script>
 </body>
 

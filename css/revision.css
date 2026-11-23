@@ -1342,3 +1342,28 @@ body:has(.michi-lanzador[aria-expanded="true"]) .aviso-flotante {
     object-fit: contain;
     background: #171317;
 }
+/* Teléfonos: las tres cifras de resumen caben en una sola fila (antes ocupaban tres pantallas). */
+@media (max-width: 560px) {
+    .resumen {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: .6rem;
+    }
+    .resumen .tarjeta-cifra {
+        padding: .9rem .4rem;
+    }
+    .resumen .tarjeta-cifra strong {
+        font-size: 1.7rem;
+    }
+    .resumen .tarjeta-cifra span {
+        font-size: .78rem;
+        line-height: 1.25;
+    }
+}
+
+/* El atributo hidden debe ganar a los estilos de formularios y botones (página de acceso). */
+.form-tarjeta [hidden] {
+    display: none !important;
+}
+.form-tarjeta #acceso-aviso[data-tipo="error"] {
+    border-left-color: #c0392b;
+}

@@ -15,8 +15,8 @@
 
 ## Consideraciones
 - El recorrido 360° y el QR 3D usan **servicios/bibliotecas externos**: requieren internet. El recorrido externo puede bloquear la visualización dentro de un iframe según sus propias políticas; siempre hay un botón para abrirlo directamente.
-- Este prototipo no tiene cuentas, base de datos ni autorización real. Las solicitudes se guardan exclusivamente en `localStorage` del navegador.
-- Si tienes datos previos de prueba en el mismo origen y las fotografías de algún gato se ven distintas de su nombre, puedes usar la opción **Restablecer datos** del panel de demostración para volver a la semilla actual. Esto borrará tus solicitudes de prueba.
+- Las cuentas, los gatos, las solicitudes y los mensajes se guardan en **Supabase** (base de datos con reglas RLS). La configuración pública está en `js/supabase-config.js` y el esquema en `supabase/`. Ver `supabase/README.md`.
+- Sin configuración de Supabase, el sitio usa `localStorage` como respaldo y el área de gestión queda restringida.
 - El proyecto contiene fotos de referencia de los recursos compartidos, no fotografías verificadas de gatos realmente disponibles para adoptar.
 
 ## Archivos
@@ -25,6 +25,8 @@
 - `css/estilos.css`: estilo original.
 - `css/revision.css`: cambios solicitados.
 - `js/app.js`: lógica de carruseles, solicitudes y resto de la web.
+- `js/db.js`, `js/acceso.js`, `js/supabase-config.js`: cuentas, base de datos y página de acceso.
+- `supabase/schema.sql` y `supabase/seed.sql`: base de datos y datos iniciales.
 - `img/`: imágenes nuevas 4:5, favicon y miniaturas.
 - `modelos/gatito-3d.glb` y `videos/logo-animado.mp4`: animaciones conservadas.
 

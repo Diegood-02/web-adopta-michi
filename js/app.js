@@ -8,6 +8,8 @@
     motorChat.src = "js/michi-chat.js";
     document.head.append(motorChat);
   }
+  const DB = window.MICHI_DB;
+  const remoto = !!DB?.activo;
   const $ = (s, root = document) => root.querySelector(s);
   const $$ = (s, root = document) => [...root.querySelectorAll(s)];
   const clonar = (x) => JSON.parse(JSON.stringify(x));
@@ -24,9 +26,9 @@
           "'": "&#39;",
         })[m],
     );
-  const img = (g) =>
+  const img = (g) => g.foto_url ||
     `img/gato-${Number(g.imagen) >= 1 && Number(g.imagen) <= 7 ? Number(g.imagen) : 1}.jpg`;
-  const fotosGato = (g) => [
+  const fotosGato = (g) => g.foto_url ? [g.foto_url] : [
     img(g),
     ...(window.MICHI_GALERIAS?.[Number(g.imagen)] || []),
   ];
@@ -42,6 +44,7 @@
       disponible: "En adopción",
       adoptado: "Adoptado",
       archivado: "Archivado",
+      borrador: "Borrador",
       pendiente: "En revisión",
       aprobada: "Aceptada",
       rechazada: "Rechazada",
@@ -85,6 +88,7 @@
     avisoTiempo = setTimeout(() => (t.hidden = true), 5200);
   }
   function guardar() {
+    if (remoto) return true; // con base de datos no se usa localStorage
     try {
       localStorage.setItem(CLAVE, JSON.stringify(datos));
       puedeGuardar = true;
@@ -309,7 +313,7 @@
       )
       .join(
         "",
-      )}</div><p class="galeria-nota texto-muted">Fotos de referencia para el prototipo; pueden mostrar gatos de apariencia similar.</p></div><div class="perfil-datos"><span class="pre-titulo">♥ CONOCE A TU NUEVO AMIGO</span><h1>${escapeHTML(g.nombre)}</h1><p><strong>${escapeHTML(meses(g.edad))} · ${escapeHTML(g.sexo)} · ${escapeHTML(g.personalidad)}</strong></p><span class="etiqueta-estado ${escapeHTML(g.estado)}">${escapeHTML(estadoEtiqueta(g.estado))}</span><div class="medico"><h3>🩺 Estado médico de ejemplo</h3><ul>${med}</ul><small class="texto-muted">Información ilustrativa, no reemplaza un expediente o valoración veterinaria.</small></div><h3>Su historia</h3><p class="perfil-historia">${escapeHTML(g.historia)}</p><p>${escapeHTML(g.descripcion)}</p><div class="perfil-banner">🐱 Antes de adoptar, recuerda que el compromiso de cuidar a un gato es de largo plazo.</div>${g.estado === "disponible" ? `<a href="solicitar.html?id=${g.id}" class="btn btn-rosa">Solicitar adopción</a>` : `<a href="adopciones.html" class="btn btn-outline">Buscar otro gatito</a>`}</div></div>`;
+      )}</div><p class="galeria-nota texto-muted">Fotos de referencia; pueden mostrar gatos de apariencia similar.</p></div><div class="perfil-datos"><span class="pre-titulo">♥ CONOCE A TU NUEVO AMIGO</span><h1>${escapeHTML(g.nombre)}</h1><p><strong>${escapeHTML(meses(g.edad))} · ${escapeHTML(g.sexo)} · ${escapeHTML(g.personalidad)}</strong></p><span class="etiqueta-estado ${escapeHTML(g.estado)}">${escapeHTML(estadoEtiqueta(g.estado))}</span><div class="medico"><h3>🩺 Estado médico</h3><ul>${med}</ul><small class="texto-muted">Información de referencia, no reemplaza un expediente o valoración veterinaria.</small></div><h3>Su historia</h3><p class="perfil-historia">${escapeHTML(g.historia)}</p><p>${escapeHTML(g.descripcion)}</p><div class="perfil-banner">🐱 Antes de adoptar, recuerda que el compromiso de cuidar a un gato es de largo plazo.</div>${g.estado === "disponible" ? `<a href="solicitar.html?id=${g.id}" class="btn btn-rosa">Solicitar adopción</a>` : `<a href="adopciones.html" class="btn btn-outline">Buscar otro gatito</a>`}</div></div>`;
   }
   document.addEventListener("click", (e) => {
     const boton = e.target.closest(".mini-foto-boton");
@@ -335,8 +339,16 @@
       $(".form-tarjeta").hidden = true;
       return;
     }
+    if (remoto && !DB.usuario) {
+      location.replace(`acceso.html?volver=${encodeURIComponent(`solicitar.html?id=${g.id}`)}`);
+      return;
+    }
+    if (remoto) {
+      const nota = $(".nota-demo");
+      if (nota) nota.innerHTML = "Tu solicitud queda registrada en tu cuenta y la revisa el equipo del refugio. Usa datos reales de contacto.";
+    }
     elegido.innerHTML = `<img src="${img(g)}" alt="${escapeHTML(g.nombre)}"><div><strong>Solicitud de adopción para ${escapeHTML(g.nombre)}</strong><p>${escapeHTML(meses(g.edad))} · ${escapeHTML(g.personalidad)}</p></div>`;
-    f.addEventListener("submit", (ev) => {
+    f.addEventListener("submit", async (ev) => {
       ev.preventDefault();
       if (!f.reportValidity()) return;
       if (gatoPorId(g.id)?.estado !== "disponible") {
@@ -346,7 +358,7 @@
       const a = Object.fromEntries(new FormData(f));
       if (Number(a.edad) < 18) {
         avisar(
-          "El formulario de prueba es solo para personas mayores de edad.",
+          "Solo pueden adoptar personas mayores de edad.",
         );
         return;
       }
@@ -356,8 +368,24 @@
         );
         return;
       }
-      const folio = `MICH-${Date.now().toString(36).toUpperCase()}`;
-      datos.solicitudes.unshift({
+      let folio = `MICH-${Date.now().toString(36).toUpperCase()}`;
+      if (remoto) {
+        const boton = f.querySelector('[type="submit"]');
+        boton.disabled = true;
+        try {
+          const creada = await DB.crearSolicitud({
+            gatoId: g.id, nombre: String(a.nombre).trim(), edad: Number(a.edad),
+            telefono: String(a.telefono).trim(), correo: String(a.correo).trim(),
+            direccion: String(a.direccion).trim(), mascotas: a.mascotas,
+            experiencia: a.experiencia, acuerdo: a.acuerdo, motivo: String(a.motivo).trim(),
+          });
+          folio = creada.id;
+        } catch (err) {
+          avisar(err.message);
+          boton.disabled = false;
+          return;
+        }
+      } else datos.solicitudes.unshift({
         id: folio,
         gatoId: g.id,
         gatoNombre: g.nombre,
@@ -376,7 +404,7 @@
       const guardo = guardar();
       f.reset();
       $(".form-tarjeta").innerHTML =
-        `<div class="centrar"><span style="font-size:3rem">💗</span><h1>¡Solicitud registrada!</h1><p>Tu folio de prueba es <strong>${escapeHTML(folio)}</strong>.</p><p>${guardo ? "Quedó guardada solo en este navegador." : "Tu navegador bloqueó el guardado; puede perderse al salir."} No fue enviada a ningún refugio.</p><a href="solicitudes.html" class="btn btn-rosa">Ver mis solicitudes</a></div>`;
+        `<div class="centrar"><span style="font-size:3rem">💗</span><h1>¡Solicitud registrada!</h1><p>Tu folio es <strong>${escapeHTML(folio)}</strong>.</p><p>${remoto ? "Tu solicitud quedó registrada en tu cuenta. Puedes revisar su estado en Solicitudes." : `${guardo ? "Quedó guardada solo en este navegador." : "Tu navegador bloqueó el guardado; puede perderse al salir."} No fue enviada a ningún refugio.`}</p><a href="solicitudes.html" class="btn btn-rosa">Ver mis solicitudes</a></div>`;
       window.scrollTo({ top: 0, behavior: "smooth" });
     });
   }
@@ -385,10 +413,15 @@
   }
   function solicitudCard(s, admin = false) {
     const g = gatoPorId(s.gatoId);
-    return `<article class="solicitud-fila">${g ? `<img src="${img(g)}" alt="Foto de ${escapeHTML(g.nombre)}">` : '<span aria-hidden="true">🐾</span>'}<div class="crecer"><strong>${escapeHTML(s.gatoNombre || g?.nombre || "Michi")} ${admin ? `— ${escapeHTML(s.nombre)}` : ""}</strong><small>Folio: ${escapeHTML(s.id)} · ${fecha(s.fecha)}</small>${admin ? `<small>Correo demo: ${escapeHTML(s.correo)} · Motivo: ${escapeHTML(s.motivo)}</small>` : ""}</div><span class="status ${escapeHTML(s.estado)}">${escapeHTML(estadoEtiqueta(s.estado))}</span>${admin && s.estado === "pendiente" ? `<div class="acciones"><button type="button" class="btn-small" data-aprobar="${escapeHTML(s.id)}">Aprobar</button><button type="button" class="btn-small peligro" data-rechazar="${escapeHTML(s.id)}">Rechazar</button></div>` : ""}</article>`;
+    return `<article class="solicitud-fila">${g ? `<img src="${img(g)}" alt="Foto de ${escapeHTML(g.nombre)}">` : '<span aria-hidden="true">🐾</span>'}<div class="crecer"><strong>${escapeHTML(s.gatoNombre || g?.nombre || "Michi")} ${admin ? `— ${escapeHTML(s.nombre)}` : ""}</strong><small>Folio: ${escapeHTML(s.id)} · ${fecha(s.fecha)}</small>${admin ? `<small>Teléfono: ${escapeHTML(s.telefono)} · Correo: ${escapeHTML(s.correo)}</small><small>Edad: ${escapeHTML(s.edad)} · Dirección: ${escapeHTML(s.direccion)}</small><small>Otras mascotas: ${escapeHTML(s.mascotas)} · Ha tenido gatos: ${escapeHTML(s.experiencia)} · Acuerdo del hogar: ${escapeHTML(s.acuerdo)}</small><small>Motivo: ${escapeHTML(s.motivo)}</small>` : ""}</div><span class="status ${escapeHTML(s.estado)}">${escapeHTML(estadoEtiqueta(s.estado))}</span>${admin && s.estado === "pendiente" ? `<div class="acciones"><button type="button" class="btn-small" data-aprobar="${escapeHTML(s.id)}">Aprobar</button><button type="button" class="btn-small peligro" data-rechazar="${escapeHTML(s.id)}">Rechazar</button></div>` : ""}</article>`;
   }
   function initSolicitudes() {
-    const a = datos.solicitudes;
+    if (remoto && !DB.usuario) {
+      $("#resumen-solicitudes").innerHTML = "";
+      $("#lista-solicitudes").innerHTML = `<div class="vacio">🐾 Inicia sesión para ver tus solicitudes. <a class="texto-enlace" href="acceso.html?volver=solicitudes.html">Iniciar sesión →</a></div>`;
+      return;
+    }
+    const a = remoto ? datos.solicitudes.filter((s) => s.userId === DB.usuario.id) : datos.solicitudes;
     $("#resumen-solicitudes").innerHTML =
       resumenCifra(a.length, "Solicitudes enviadas") +
       resumenCifra(
@@ -402,7 +435,7 @@
     $("#lista-solicitudes").innerHTML = a.length
       ? a.map((s) => solicitudCard(s)).join("")
       : vacio(
-          "Aún no tienes solicitudes de prueba. Visita Adopciones para crear una.",
+          remoto ? "Aún no tienes solicitudes. Visita Adopciones para crear una." : "Aún no tienes solicitudes. Visita Adopciones para crear una.",
         );
   }
   function initBlog() {
@@ -531,7 +564,7 @@
   }
   function initAyuda() {
     const dialogo = $("#chat-conversacion");
-    function agregar(texto, yo, enlace = null) {
+    function agregar(texto, yo, enlace = null, sugerencias = null) {
       const div = document.createElement("div");
       div.className = `burbuja ${yo ? "yo" : ""}`;
       div.textContent = texto;
@@ -546,6 +579,18 @@
         }
         div.append(document.createElement("br"), a);
       }
+      if (sugerencias?.length) {
+        const fila = document.createElement("div");
+        fila.className = "preguntas-rapidas";
+        for (const sug of sugerencias) {
+          const b = document.createElement("button");
+          b.type = "button";
+          b.textContent = sug;
+          b.addEventListener("click", () => preguntar(sug));
+          fila.append(b);
+        }
+        div.append(fila);
+      }
       dialogo.append(div);
       dialogo.scrollTop = dialogo.scrollHeight;
     }
@@ -554,7 +599,7 @@
       if (!q) return;
       agregar(q, true);
       const r = respuestaChat(q);
-      agregar(r.texto, false, r.enlace);
+      agregar(r.texto, false, r.enlace, r.sugerencias);
     }
     agregar(
       "¡Hola! Soy Michi 🐱. Puedes preguntar por adopciones, solicitudes, veterinarias o cuidados.",
@@ -568,11 +613,25 @@
     $$("[data-pregunta]").forEach((b) =>
       b.addEventListener("click", () => preguntar(b.dataset.pregunta)),
     );
-    $("#form-contacto")?.addEventListener("submit", (e) => {
+    $("#form-contacto")?.addEventListener("submit", async (e) => {
       e.preventDefault();
       const f = e.currentTarget;
       if (!f.reportValidity()) return;
       const d = Object.fromEntries(new FormData(f));
+      if (remoto) {
+        if (!DB.usuario) {
+          location.href = "acceso.html?volver=ayuda.html";
+          return;
+        }
+        try {
+          await DB.crearMensaje({ nombre: d.nombre.trim(), correo: d.correo.trim(), motivo: d.motivo, mensaje: d.mensaje.trim() });
+          f.reset();
+          avisar("Mensaje enviado. ¡Gracias por escribirnos!");
+        } catch (err) {
+          avisar(err.message);
+        }
+        return;
+      }
       datos.mensajes.unshift({
         id: Date.now(),
         nombre: d.nombre.trim(),
@@ -584,11 +643,26 @@
       guardar();
       f.reset();
       avisar(
-        "Mensaje de prueba guardado localmente. No se envió ningún correo.",
+        "Mensaje guardado.",
       );
     });
   }
+  async function recargar() {
+    if (remoto) datos = await DB.cargar();
+  }
   function initGestion() {
+    if (remoto && !DB.admin) {
+      const m = $("main");
+      m.innerHTML = `<section class="bloque"><div class="contenedor"><div class="vacio">🔒 Esta área es solo para administradores. ${DB.usuario ? "Tu cuenta no tiene permisos." : '<a class="texto-enlace" href="acceso.html?volver=gestion.html">Iniciar sesión →</a>'}</div></div></section>`;
+      return;
+    }
+    if (remoto) {
+      $(".nota-demo")?.remove();
+      $("#reiniciar-demo")?.closest(".reinicio")?.remove();
+      document.querySelector('#form-gato [name="estado"]')?.insertAdjacentHTML("beforeend", '<option value="borrador">Borrador</option>');
+    }
+    const filtroSol = $("#filtro-solicitud-gato");
+    filtroSol.addEventListener("change", () => dibujar());
     const tabs = $$("[data-tab]");
     tabs.forEach((b) =>
       b.addEventListener("click", () => {
@@ -620,13 +694,18 @@
         ? datos.gatos
             .map(
               (g) =>
-                `<div class="item-admin"><div class="info"><strong>${escapeHTML(g.nombre)}</strong><small>${escapeHTML(meses(g.edad))} · ${escapeHTML(estadoEtiqueta(g.estado))}</small></div><div class="acciones"><button type="button" class="btn-small" data-editar="${g.id}">Editar</button><button type="button" class="btn-small ${g.estado === "archivado" ? "" : "peligro"}" data-archivo="${g.id}">${g.estado === "archivado" ? "Restaurar" : "Archivar"}</button></div></div>`,
+                `<div class="item-admin"><div class="info"><strong>${escapeHTML(g.nombre)}</strong><small>${escapeHTML(meses(g.edad))} · ${escapeHTML(estadoEtiqueta(g.estado))}</small></div><div class="acciones"><button type="button" class="btn-small" data-editar="${g.id}">Editar</button><button type="button" class="btn-small" data-ver-solicitudes="${g.id}">Solicitudes (${datos.solicitudes.filter((s) => s.gatoId === g.id).length})</button><button type="button" class="btn-small peligro" data-borrar-gato="${g.id}">Eliminar</button><button type="button" class="btn-small ${g.estado === "archivado" ? "" : "peligro"}" data-archivo="${g.id}">${g.estado === "archivado" ? "Restaurar" : "Archivar"}</button></div></div>`,
             )
             .join("")
         : vacio("No hay gatos registrados.");
-      $("#gestion-solicitudes").innerHTML = datos.solicitudes.length
-        ? datos.solicitudes.map((s) => solicitudCard(s, true)).join("")
-        : vacio("Todavía no hay solicitudes para revisar.");
+      const sel = $("#filtro-solicitud-gato");
+      const previo = sel.value;
+      sel.innerHTML = '<option value="">Todos los gatos</option>' + datos.gatos.map((g) => `<option value="${g.id}">${escapeHTML(g.nombre)}</option>`).join("");
+      sel.value = previo;
+      const lista = datos.solicitudes.filter((s) => !sel.value || String(s.gatoId) === sel.value);
+      $("#gestion-solicitudes").innerHTML = lista.length
+        ? lista.map((s) => solicitudCard(s, true)).join("")
+        : vacio(sel.value ? "Este gatito todavía no tiene solicitudes." : "Todavía no hay solicitudes para revisar.");
       $("#gestion-vets").innerHTML = datos.veterinarias.length
         ? datos.veterinarias
             .map(
@@ -642,7 +721,7 @@
                 `<div class="item-admin"><div class="info"><strong>${escapeHTML(m.motivo)} · ${escapeHTML(m.nombre)}</strong><small>${escapeHTML(m.correo)} · ${fecha(m.fecha)}</small><small>${escapeHTML(m.mensaje)}</small></div><button type="button" class="btn-small peligro" data-borrar-mensaje="${m.id}">Eliminar</button></div>`,
             )
             .join("")
-        : vacio("No hay mensajes de prueba.");
+        : vacio("No hay mensajes.");
     }
     const f = $("#form-gato");
     function limpiar() {
@@ -650,9 +729,10 @@
       f.elements.id.value = "";
       $("#titulo-form-gato").textContent = "Agregar gatito";
       $("#cancelar-edicion").hidden = true;
+      $("#foto-actual").textContent = "";
     }
     $("#cancelar-edicion").addEventListener("click", limpiar);
-    f.addEventListener("submit", (e) => {
+    f.addEventListener("submit", async (e) => {
       e.preventDefault();
       if (!f.reportValidity()) return;
       const d = Object.fromEntries(new FormData(f));
@@ -684,6 +764,20 @@
         esterilizado: !!d.esterilizado,
         desparasitado: !!d.desparasitado,
       };
+      if (remoto) {
+        try {
+          const archivo = f.elements.foto.files[0];
+          if (archivo) entrada.foto_url = await DB.subirFoto(archivo);
+          await DB.guardarGato(entrada, d.id ? Number(d.id) : null);
+          await recargar();
+          limpiar();
+          dibujar();
+          avisar("Perfil guardado.");
+        } catch (err) {
+          avisar(err.message);
+        }
+        return;
+      }
       if (d.id) {
         const g = gatoPorId(d.id);
         if (!g) {
@@ -701,7 +795,7 @@
       dibujar();
       avisar("Perfil guardado en este navegador.");
     });
-    $("#form-vet").addEventListener("submit", (e) => {
+    $("#form-vet").addEventListener("submit", async (e) => {
       e.preventDefault();
       const form = e.currentTarget;
       if (!form.reportValidity()) return;
@@ -713,6 +807,18 @@
         form.elements.maps.focus();
         return;
       }
+      if (remoto) {
+        try {
+          await DB.guardarVet(v);
+          await recargar();
+          form.reset();
+          dibujar();
+          avisar("Ficha agregada al directorio.");
+        } catch (err) {
+          avisar(err.message);
+        }
+        return;
+      }
       datos.veterinarias.push({
         id: Math.max(0, ...datos.veterinarias.map((x) => x.id)) + 1,
         ...v,
@@ -722,9 +828,53 @@
       dibujar();
       avisar("Ficha agregada al directorio en este navegador.");
     });
-    document.addEventListener("click", (e) => {
+    document.addEventListener("click", async (e) => {
       const b = e.target.closest("button");
       if (!b) return;
+      if (b.dataset.verSolicitudes) {
+        filtroSol.value = b.dataset.verSolicitudes;
+        document.querySelector('[data-tab="solicitudes"]').click();
+        dibujar();
+        return;
+      }
+      if (remoto && b.dataset.borrarGato) {
+        const g = gatoPorId(b.dataset.borrarGato);
+        if (!g) return;
+        const n = datos.solicitudes.filter((s) => s.gatoId === g.id).length;
+        if (!confirm(`¿Eliminar el perfil de ${g.nombre}? No se puede deshacer.${n ? ` También se borrarán sus ${n} solicitud(es).` : ""}`)) return;
+        try {
+          await DB.borrarGato(g);
+          await recargar();
+          dibujar();
+          avisar("Perfil eliminado.");
+        } catch (err) {
+          avisar(err.message);
+        }
+        return;
+      }
+      if (remoto && (b.dataset.archivo || b.dataset.aprobar || b.dataset.rechazar || b.dataset.borrarVet || b.dataset.borrarMensaje)) {
+        try {
+          if (b.dataset.archivo) {
+            const g = gatoPorId(b.dataset.archivo);
+            if (!g) return;
+            await DB.guardarGato({ ...g, estado: g.estado === "archivado" ? "disponible" : "archivado" }, g.id);
+          } else if (b.dataset.aprobar || b.dataset.rechazar) {
+            await DB.resolverSolicitud(b.dataset.aprobar || b.dataset.rechazar, !!b.dataset.aprobar);
+          } else if (b.dataset.borrarVet) {
+            if (!confirm("¿Quitar esta ficha del directorio?")) return;
+            await DB.borrarVet(Number(b.dataset.borrarVet));
+          } else if (b.dataset.borrarMensaje) {
+            if (!confirm("¿Eliminar este mensaje?")) return;
+            await DB.borrarMensaje(Number(b.dataset.borrarMensaje));
+          }
+          await recargar();
+          dibujar();
+          avisar("Cambios guardados.");
+        } catch (err) {
+          avisar(err.message);
+        }
+        return;
+      }
       if (b.dataset.editar) {
         const g = gatoPorId(b.dataset.editar);
         if (!g) return;
@@ -743,6 +893,7 @@
         for (const k of ["vacunas", "esterilizado", "desparasitado"])
           f.elements[k].checked = !!g[k];
         $("#titulo-form-gato").textContent = `Editar a ${g.nombre}`;
+        $("#foto-actual").textContent = g.foto_url ? "Ya tiene una foto propia. Sube otra para reemplazarla." : "";
         $("#cancelar-edicion").hidden = false;
         f.scrollIntoView({ behavior: "smooth", block: "center" });
       }
@@ -796,10 +947,10 @@
         );
         guardar();
         dibujar();
-        avisar("Mensaje de prueba eliminado.");
+        avisar("Mensaje eliminado.");
       }
     });
-    $("#reiniciar-demo").addEventListener("click", () => {
+    $("#reiniciar-demo")?.addEventListener("click", () => {
       if (
         !confirm(
           "¿Restablecer todos los datos de ejemplo? Se borrarán las solicitudes, mensajes y cambios hechos en este navegador.",
@@ -815,7 +966,30 @@
     dibujar();
   }
   window.MICHI_INICIAR_CHAT = initAyuda;
-  actualizarDirectorio();
+  async function arrancar() {
+  if (remoto) {
+    try {
+      await DB.iniciar();
+      datos = await DB.cargar();
+    } catch (err) {
+      datos = { gatos: [], veterinarias: [], solicitudes: [], mensajes: [] };
+      avisar("No pudimos conectar con el servidor. Intenta de nuevo en unos minutos.");
+    }
+    // El asistente responde con lo que hay en la base (sin borradores).
+    window.MICHI_SEMILLA = {
+      ...window.MICHI_SEMILLA,
+      gatos: datos.gatos.filter((g) => g.estado !== "borrador" && g.estado !== "archivado"),
+      veterinarias: datos.veterinarias,
+    };
+    DB.pintarMenu();
+  } else actualizarDirectorio();
+  // El chat consulta aquí las solicitudes de la persona (solo las suyas).
+  window.MICHI_CONTEXTO = {
+    usuario: remoto ? !!DB.usuario : true,
+    solicitudes: remoto
+      ? datos.solicitudes.filter((s) => s.userId === DB.usuario?.id)
+      : datos.solicitudes,
+  };
   configurarMenu();
   const inicializar = {
     index: initInicio,
@@ -831,8 +1005,10 @@
     gestion: initGestion,
   };
   if (inicializar[pagina]) inicializar[pagina]();
-  if (!puedeGuardar)
+  if (!remoto && !puedeGuardar)
     avisar(
       "Almacenamiento local deshabilitado; los cambios podrían perderse al recargar.",
     );
+  }
+  arrancar();
 })();
