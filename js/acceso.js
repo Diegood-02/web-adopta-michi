@@ -51,7 +51,7 @@
   }
   document.querySelectorAll("#acceso-tabs button").forEach((b) => b.addEventListener("click", () => poner(b.dataset.modo)));
 
-  const claveValida = (c) => c.length >= 8 && /[A-Za-z]/.test(c) && /\d/.test(c);
+  const claveValida = (c) => c.length >= 8 && /[a-z]/.test(c) && /[A-Z]/.test(c) && /\d/.test(c) && /[^A-Za-z0-9]/.test(c);
 
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
@@ -67,7 +67,7 @@
       }
       if (modo === "crear") {
         if (!claveValida(clave)) {
-          mostrar("La contraseña necesita al menos 8 caracteres, con letras y números.", "error");
+          mostrar("La contraseña necesita al menos 8 caracteres, con mayúsculas, minúsculas, números y un símbolo.", "error");
           return;
         }
         await DB.registrar(correo, clave, form.elements.nombre.value.trim());
@@ -98,7 +98,7 @@
     e.preventDefault();
     const clave = nueva.elements.clave.value;
     if (!claveValida(clave)) {
-      mostrar("La contraseña necesita al menos 8 caracteres, con letras y números.", "error");
+      mostrar("La contraseña necesita al menos 8 caracteres, con mayúsculas, minúsculas, números y un símbolo.", "error");
       return;
     }
     try {
